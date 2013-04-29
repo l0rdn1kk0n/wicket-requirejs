@@ -76,5 +76,6 @@ var require;
     script.setAttribute("type", "application/javascript");
     script.setAttribute("src", requireJsPath);
     script.setAttribute("defer", "true");
-    document.getElementsByTagName("head")[0].appendChild(script);
+    var me = document.getElementsByTagName("script")[0];
+	me.parentNode.insertBefore(script, me);
 }());

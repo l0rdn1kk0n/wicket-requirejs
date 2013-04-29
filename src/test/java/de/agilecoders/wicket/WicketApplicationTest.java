@@ -1,8 +1,7 @@
 package de.agilecoders.wicket;
 
-import de.agilecoders.wicket.requirejs.BootstrapJavaScriptResourceReference;
-import de.agilecoders.wicket.requirejs.RequireJsResourceBundles;
 import de.agilecoders.wicket.requirejs.RequireJs;
+import de.agilecoders.wicket.requirejs.RequireJsResourceBundles;
 import de.agilecoders.wicket.requirejs.RequireJsSettings;
 import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.core.util.resource.ClassPathResourceFinder;
@@ -55,7 +54,7 @@ public abstract class WicketApplicationTest {
                     RequireJs.install(this, new RequireJsSettings());
 
                     getResourceSettings().getResourceFinders().add(new ClassPathResourceFinder(""));
-                    getResourceBundles().addJavaScriptBundle(BootstrapJavaScriptResourceReference.class, "main.js", new BootstrapJavaScriptResourceReference());
+//                    getResourceBundles().addJavaScriptBundle(WicketApplicationTest.class, "main.js", new BootstrapJavaScriptResourceReference());
                 }
             }
         };

@@ -1,15 +1,16 @@
 package de.agilecoders.wicket.requirejs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.ajax.json.JSONException;
 import org.apache.wicket.ajax.json.JSONObject;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-
-import java.util.Map;
+import org.apache.wicket.util.template.PackageTextTemplate;
 
 /**
  * TODO miha: document class purpose
@@ -19,7 +20,6 @@ import java.util.Map;
 public class RequireJsTag extends Label {
 
     private final IModel<String> mainScriptModel;
-    private final ScriptModel scriptModel;
 
     /**
      * Construct.
@@ -31,7 +31,6 @@ public class RequireJsTag extends Label {
     public RequireJsTag(final String id, final IModel<String> mainScriptModel) {
         super(id, new Model<String>());
 
-        this.scriptModel = new ScriptModel();
         this.mainScriptModel = mainScriptModel;
 
         setEscapeModelStrings(false);
@@ -50,12 +49,13 @@ public class RequireJsTag extends Label {
     protected void onConfigure() {
         super.onConfigure();
 
-        setDefaultModelObject(scriptModel.getObject()
-                                      .replace("'${bundles}'", createBundlesMap())
-                                      .replace("${requireJsPath}", requireJsUrl())
-                                      .replace("${mainJs}", mainScriptModel.getObject())
-                                      .replace("${basePath}", requireJsUrl())
-        );
+	    PackageTextTemplate requireJsConfig = new PackageTextTemplate(RequireJs.class, "bootstrap.js");
+	    Map<String, Object> variables = new HashMap<>();
+	    variables.put("bundles'", createBundlesMap());
+	    variables.put("requireJsPath", requireJsUrl());
+	    variables.put("mainJs", mainScriptModel.getObject());
+	    variables.put("basePath", requireJsUrl());
+        setDefaultModelObject(requireJsConfig.asString(variables));
     }
 
     /**
@@ -91,16 +91,6 @@ public class RequireJsTag extends Label {
         super.detachModels();
 
         mainScriptModel.detach();
-        scriptModel.detach();
     }
 
-    /**
-     * wrapper model for bootstrap.js file that returns the content as string.
-     */
-    private static final class ScriptModel extends LoadableDetachableModel<String> {
-        @Override
-        protected String load() {
-            return new BootstrapJavaScriptResourceReference().asText();
-        }
-    }
 }
