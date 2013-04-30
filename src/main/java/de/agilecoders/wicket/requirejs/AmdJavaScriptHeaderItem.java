@@ -3,7 +3,10 @@ package de.agilecoders.wicket.requirejs;
 import java.util.Collections;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.markup.head.HeaderItem;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Response;
@@ -54,7 +57,7 @@ public class AmdJavaScriptHeaderItem extends FilteredHeaderItem
 		public Iterable<?> getRenderTokens()
 		{
 			String url = Strings.stripJSessionId(getUrl());
-			return Collections.singletonList("amd-javascript-" + url);
+			return Collections.singletonList("amd-javascript-" + name);
 		}
 
 		@Override
@@ -69,9 +72,11 @@ public class AmdJavaScriptHeaderItem extends FilteredHeaderItem
 		{
 			IRequestHandler handler = null;
 			if (Application.exists()) {
-				RequireJsResourceBundles resourceBundles = (RequireJsResourceBundles) Application.get().getResourceBundles();
-				ResourceReference bundleReference = resourceBundles.findBundle(reference);
-				if (bundleReference != null) {
+				ResourceBundles resourceBundles = Application.get().getResourceBundles();
+				HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(reference, name));
+				if (bundleItem instanceof JavaScriptReferenceHeaderItem) {
+					JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
+					ResourceReference bundleReference = jsBundleItem.getReference();
 					handler = new ResourceReferenceRequestHandler(bundleReference, null);
 				}
 			}
