@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
-import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.ResourceReferenceRegistry;
@@ -17,40 +16,41 @@ import org.apache.wicket.request.resource.ResourceReferenceRegistry;
  * @author miha
  */
 public class RequireJsResourceBundles extends ResourceBundles {
-    private final Map<ResourceReference.Key, JavaScriptReferenceHeaderItem> bundles;
 
-    /**
-     * Construct.
-     *
-     * @param registry the registry that keeps all referenced resources
-     */
-    public RequireJsResourceBundles(ResourceReferenceRegistry registry) {
-        super(registry);
+	private final Map<ResourceReference.Key, JavaScriptReferenceHeaderItem> bundles;
 
-        this.bundles = new HashMap<ResourceReference.Key, JavaScriptReferenceHeaderItem>();
-    }
+	/**
+	 * Construct.
+	 *
+	 * @param registry the registry that keeps all referenced resources
+	 */
+	public RequireJsResourceBundles(ResourceReferenceRegistry registry) {
+		super(registry);
 
-    @Override
-    public JavaScriptReferenceHeaderItem addJavaScriptBundle(final Class<?> scope, final String name, final JavaScriptResourceReference... references) {
-        final JavaScriptReferenceHeaderItem item = super.addJavaScriptBundle(scope, name, references);
+		this.bundles = new HashMap<>();
+	}
 
-        // TODO: create correct key (class is missing)
-        bundles.put(new ResourceReference.Key(scope.getName(), name, null, null, null), item);
+	@Override
+	public JavaScriptReferenceHeaderItem addJavaScriptBundle(final Class<?> scope, final String name, final JavaScriptResourceReference... references) {
+		final JavaScriptReferenceHeaderItem item = super.addJavaScriptBundle(scope, name, references);
 
-        return item;
-    }
+		for (ResourceReference reference : references) {
+			bundles.put(new ResourceReference.Key(reference.getScope().getName(), reference.getName(), null, null, null), item);
+		}
 
-    /**
-     * @param requestCycle current {@link RequestCycle} for this request.
-     * @return a map that contains mapping of bundle name to resource url
-     */
-    public Map<String, CharSequence> javascriptBundles(final RequestCycle requestCycle) {
-        final Map<String, CharSequence> bundleUrls = new HashMap<String, CharSequence>(bundles.size());
+		return item;
+	}
 
-        for (Map.Entry<ResourceReference.Key, JavaScriptReferenceHeaderItem> entry : bundles.entrySet()) {
-            bundleUrls.put(entry.getKey().getName(), requestCycle.urlFor(entry.getValue().getReference(), null));
-        }
+	public ResourceReference findBundle(ResourceReference reference) {
+		ResourceReference bundleReference = null;
 
-        return bundleUrls;
-    }
+		for (Map.Entry<ResourceReference.Key, JavaScriptReferenceHeaderItem> bundle : bundles.entrySet()) {
+			if (reference.getKey().equals(bundle.getKey())) {
+				bundleReference = bundle.getValue().getReference();
+				break;
+			}
+		}
+
+		return bundleReference;
+	}
 }

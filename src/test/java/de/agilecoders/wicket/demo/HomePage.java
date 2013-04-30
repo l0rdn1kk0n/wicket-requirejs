@@ -28,5 +28,6 @@ public class HomePage extends WebPage
 		super.renderHead(response);
 
 		response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(HomePage.class, "demo1.js"), "demo"));
+		response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(HomePage.class, "pageB.js"), "pageB"));
 	}
 }

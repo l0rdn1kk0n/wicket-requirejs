@@ -2,6 +2,7 @@ package de.agilecoders.wicket.requirejs;
 
 import java.util.Collections;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.request.IRequestHandler;
@@ -9,6 +10,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceReferenceRequestHandler;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.string.Strings;
 
 /**
@@ -59,13 +61,23 @@ public class AmdJavaScriptHeaderItem extends FilteredHeaderItem
 		public void render(Response response)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.append(getName()).append("=").append(getUrl()).append('\n');
+			sb.append(getName()).append('=').append(getUrl()).append('\n');
 			response.write(sb);
 		}
 
 		public String getUrl()
 		{
-			IRequestHandler handler = new ResourceReferenceRequestHandler(reference, null);
+			IRequestHandler handler = null;
+			if (Application.exists()) {
+				RequireJsResourceBundles resourceBundles = (RequireJsResourceBundles) Application.get().getResourceBundles();
+				ResourceReference bundleReference = resourceBundles.findBundle(reference);
+				if (bundleReference != null) {
+					handler = new ResourceReferenceRequestHandler(bundleReference, null);
+				}
+			}
+			if (handler == null) {
+				handler = new ResourceReferenceRequestHandler(reference, null);
+			}
 			return RequestCycle.get().urlFor(handler).toString();
 		}
 
