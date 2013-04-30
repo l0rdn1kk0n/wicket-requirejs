@@ -20,9 +20,9 @@ public class RequireJsPanel extends Panel
 
 		add(new RequireJsConfig());
 
-		WebComponent requireJs = new WebComponent("require.js");
-		requireJs.add(AttributeModifier.replace("src", getRequireJsUrl()));
-		add(requireJs);
+		WebComponent requireJsScript = new WebComponent("require.js");
+		requireJsScript.add(AttributeModifier.replace("src", getRequireJsUrl()));
+		add(requireJsScript);
 	}
 
 	private IModel<String> getRequireJsUrl()
