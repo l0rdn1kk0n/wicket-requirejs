@@ -1,6 +1,9 @@
 package de.agilecoders.wicket.demo;
 
 import de.agilecoders.wicket.requirejs.AmdHeaderResponse;
+import de.agilecoders.wicket.requirejs.IRequireJsSettings;
+import de.agilecoders.wicket.requirejs.RequireJs;
+import de.agilecoders.wicket.requirejs.RequireJsSettings;
 import org.apache.wicket.Page;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -22,6 +25,11 @@ public class RequireJsApplication extends WebApplication
 	protected void init()
 	{
 		super.init();
+
+		mountPage("some/very/deep/path", PageB.class);
+
+		IRequireJsSettings settings = new RequireJsSettings();
+		RequireJs.install(this, settings);
 
 		setHeaderResponseDecorator(new IHeaderResponseDecorator()
 		{

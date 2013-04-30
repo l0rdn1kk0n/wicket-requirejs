@@ -16,7 +16,14 @@ import org.apache.wicket.util.string.Strings;
  */
 public class AmdJavaScriptHeaderItem extends HeaderItem
 {
+	/**
+	 * The name to use as an AMD identifier
+	 */
 	private final String name;
+
+	/**
+	 * The resource reference that contributes the AMD module
+	 */
 	private final JavaScriptResourceReference reference;
 
 	public static AmdJavaScriptHeaderItem forReference(JavaScriptResourceReference reference)
@@ -45,6 +52,8 @@ public class AmdJavaScriptHeaderItem extends HeaderItem
 	@Override
 	public void render(Response response)
 	{
+		// do nothing.
+		// require.js will load this lazily by using #getUrl()
 	}
 
 	public String getUrl()
@@ -56,5 +65,11 @@ public class AmdJavaScriptHeaderItem extends HeaderItem
 	public String getName()
 	{
 		return name;
+	}
+
+	@Override
+	public Iterable<? extends HeaderItem> getDependencies()
+	{
+		return reference.getDependencies();
 	}
 }

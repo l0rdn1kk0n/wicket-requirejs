@@ -18,7 +18,7 @@ import org.apache.wicket.resource.JQueryResourceReference;
  */
 public class AmdHeaderResponse extends DecoratingHeaderResponse
 {
-	private final List<AmdJavaScriptHeaderItem> amdItems = new ArrayList<>();
+	private final List<AmdJavaScriptHeaderItem> amdItems;
 	/**
 	 * Create a header response that simply delegates all methods to the one that is passed in here.
 	 *
@@ -27,6 +27,8 @@ public class AmdHeaderResponse extends DecoratingHeaderResponse
 	public AmdHeaderResponse(IHeaderResponse real)
 	{
 		super(real);
+
+		this.amdItems = new ArrayList<>();
 	}
 
 	@Override
@@ -36,6 +38,7 @@ public class AmdHeaderResponse extends DecoratingHeaderResponse
 		{
 			if (amdItems.isEmpty())
 			{
+				// contribute Wicket resources lazily
 				amdItems.add(AmdJavaScriptHeaderItem.forReference(JQueryResourceReference.get(), "jquery"));
 				amdItems.add(AmdJavaScriptHeaderItem.forReference(WicketEventJQueryResourceReference.get(), "wicket-event"));
 				amdItems.add(AmdJavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get(), "Wicket"));
@@ -43,10 +46,8 @@ public class AmdHeaderResponse extends DecoratingHeaderResponse
 
 			amdItems.add((AmdJavaScriptHeaderItem) item);
 		}
-		else
-		{
-			super.render(item);
-		}
+
+		super.render(item);
 	}
 
 	@Override
@@ -61,11 +62,11 @@ public class AmdHeaderResponse extends DecoratingHeaderResponse
 
 	private CharSequence getContent()
 	{
-		JSONObject requireConfig = new JSONObject();
-		JSONObject paths = new JSONObject();
+		StringBuilder content = new StringBuilder();
+
 		try
 		{
-			requireConfig.put("paths", paths);
+			JSONObject requireConfig = new JSONObject();
 
 			JSONObject shim = new JSONObject();
 			requireConfig.put("shim", shim);
@@ -80,26 +81,22 @@ public class AmdHeaderResponse extends DecoratingHeaderResponse
 			shimWicket.put("deps", new JSONArray("[wicket-event]"));
 			shimWicket.put("exports", "Wicket");
 
-		} catch (JSONException e)
+			JSONObject paths = new JSONObject();
+			requireConfig.put("paths", paths);
+			for (AmdJavaScriptHeaderItem item : amdItems)
+			{
+				paths.put(item.getName(), item.getUrl());
+			}
+
+			content.append("<script>\nvar require = ");
+			content.append(requireConfig.toString(2)).append(";");
+			content.append("</script>\n");
+		}
+		catch (JSONException e)
 		{
 			e.printStackTrace();
 		}
-		for (AmdJavaScriptHeaderItem item : amdItems)
-		{
-			try
-			{
-				paths.put(item.getName(), item.getUrl());
-			} catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("<script>\nvar require = ");
-		sb.append(requireConfig.toString()).append(";");
-		sb.append("</script>\n");
-
-		return sb;
+		return content;
 	}
 }

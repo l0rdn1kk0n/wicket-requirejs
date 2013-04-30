@@ -1,13 +1,14 @@
 package de.agilecoders.wicket.requirejs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.ResourceReferenceRegistry;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is an extension to {@link ResourceBundles} that adds some
@@ -16,7 +17,7 @@ import java.util.Map;
  * @author miha
  */
 public class RequireJsResourceBundles extends ResourceBundles {
-    private final Map<String, JavaScriptReferenceHeaderItem> bundles;
+    private final Map<ResourceReference.Key, JavaScriptReferenceHeaderItem> bundles;
 
     /**
      * Construct.
@@ -26,7 +27,7 @@ public class RequireJsResourceBundles extends ResourceBundles {
     public RequireJsResourceBundles(ResourceReferenceRegistry registry) {
         super(registry);
 
-        this.bundles = new HashMap<String, JavaScriptReferenceHeaderItem>();
+        this.bundles = new HashMap<ResourceReference.Key, JavaScriptReferenceHeaderItem>();
     }
 
     @Override
@@ -34,7 +35,7 @@ public class RequireJsResourceBundles extends ResourceBundles {
         final JavaScriptReferenceHeaderItem item = super.addJavaScriptBundle(scope, name, references);
 
         // TODO: create correct key (class is missing)
-        bundles.put(name, item);
+        bundles.put(new ResourceReference.Key(scope.getName(), name, null, null, null), item);
 
         return item;
     }
@@ -46,8 +47,8 @@ public class RequireJsResourceBundles extends ResourceBundles {
     public Map<String, CharSequence> javascriptBundles(final RequestCycle requestCycle) {
         final Map<String, CharSequence> bundleUrls = new HashMap<String, CharSequence>(bundles.size());
 
-        for (Map.Entry<String, JavaScriptReferenceHeaderItem> entry : bundles.entrySet()) {
-            bundleUrls.put(entry.getKey(), requestCycle.urlFor(entry.getValue().getReference(), null));
+        for (Map.Entry<ResourceReference.Key, JavaScriptReferenceHeaderItem> entry : bundles.entrySet()) {
+            bundleUrls.put(entry.getKey().getName(), requestCycle.urlFor(entry.getValue().getReference(), null));
         }
 
         return bundleUrls;
