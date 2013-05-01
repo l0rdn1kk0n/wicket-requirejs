@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <title></title>
+</head>
+<body>
+    Wicket - RequireJs integration 2
+
+    <div wicket:id="requireJs"></div>
+
+    <script type="text/javascript">
+        require( ['pageB'], function(pageB) {
+            pageB.demo();
+        });
+    </script>
+
+<span class="text">Initial</span>
+</body>
+</html>

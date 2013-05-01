@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <title>Page C</title>
+</head>
+<body>
+
+Page c
+
+<div wicket:id="requireJs"></div>
+
+<script type="text/javascript">
+    require( ['pageB'], function(pageB) {
+        pageB.demo();
+    });
+</script>
+
+</body>
+</html>

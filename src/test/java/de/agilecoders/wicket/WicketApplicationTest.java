@@ -1,14 +1,10 @@
 package de.agilecoders.wicket;
 
-import de.agilecoders.wicket.requirejs.BootstrapJavaScriptResourceReference;
-import de.agilecoders.wicket.requirejs.RequireJsResourceBundles;
 import de.agilecoders.wicket.requirejs.RequireJs;
 import de.agilecoders.wicket.requirejs.RequireJsSettings;
-import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.core.util.resource.ClassPathResourceFinder;
 import org.apache.wicket.mock.MockApplication;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.request.resource.ResourceReferenceRegistry;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.After;
 import org.junit.Before;
@@ -45,17 +41,12 @@ public abstract class WicketApplicationTest {
         return new MockApplication() {
 
             @Override
-            protected ResourceBundles newResourceBundles(ResourceReferenceRegistry registry) {
-                return new RequireJsResourceBundles(registry);
-            }
-
-            @Override
             protected void init() {
                 if (WicketApplicationTest.this.initApplication(this)) {
                     RequireJs.install(this, new RequireJsSettings());
 
                     getResourceSettings().getResourceFinders().add(new ClassPathResourceFinder(""));
-                    getResourceBundles().addJavaScriptBundle(BootstrapJavaScriptResourceReference.class, "main.js", new BootstrapJavaScriptResourceReference());
+//                    getResourceBundles().addJavaScriptBundle(WicketApplicationTest.class, "main.js", new BootstrapJavaScriptResourceReference());
                 }
             }
         };

@@ -3,6 +3,8 @@ package de.agilecoders.wicket.requirejs;
 import de.agilecoders.wicket.webjars.util.WicketWebjars;
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.IHeaderResponseDecorator;
 
 /**
  * TODO miha: document class purpose
@@ -22,8 +24,27 @@ public final class RequireJs {
      *
      * @param application current application assigned to this thread
      */
+    public static void install(final Application application) {
+        install(application, new RequireJsSettings());
+    }
+
+    /**
+     * installs given settings to given application
+     *
+     * @param application current application assigned to this thread
+     * @param settings the configuration settings for RequireJs
+     */
     public static void install(final Application application, final IRequireJsSettings settings) {
         application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
+
+        application.setHeaderResponseDecorator(new IHeaderResponseDecorator()
+        {
+            @Override
+            public IHeaderResponse decorate(IHeaderResponse response)
+            {
+                return new FilteringHeaderResponse(response);
+            }
+        });
 
         WicketWebjars.install(application);
     }

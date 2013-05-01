@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <title>Wicket - RequireJs demo application</title>
+</head>
+<body>
+  Wicket - RequireJs integration
+
+  <div wicket:id="requireJs"></div>
+
+  <script type="text/javascript">
+      require( ['demo', "pageB"], function(demo, pageB) {
+          demo.demo();
+          pageB.demo();
+      });
+  </script>
+
+    <div><a wicket:id="pageB">Page B</a></div>
+</body>
+</html>
