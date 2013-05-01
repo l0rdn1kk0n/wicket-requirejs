@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.requirejs;
 
+import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONException;
@@ -7,8 +8,11 @@ import org.apache.wicket.ajax.json.JSONObject;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.head.filter.HeaderResponseContainer;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
-import org.apache.wicket.util.string.Strings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The {@link RequireJsConfig} renders the javascript configuration object that is used
@@ -18,6 +22,13 @@ import org.apache.wicket.util.string.Strings;
  * @author miha
  */
 class RequireJsConfig extends HeaderResponseContainer {
+
+    /**
+     * A key used to store the paths for all AMD modules in a request cycle
+     */
+    private static final MetaDataKey<Map<String, String>> PATHS_KEY = new MetaDataKey<Map<String, String>>() {
+    };
+
     private static final String KEY_SHIM = "shim";
     private static final String KEY_DEPS = "deps";
     private static final String KEY_EXPORTS = "exports";
@@ -44,20 +55,22 @@ class RequireJsConfig extends HeaderResponseContainer {
         super(id, filterName());
     }
 
+    /**
+     * @return a map that stores all amdModuleName -> amdModuleUrl per request cycle
+     */
+    public static Map<String, String> getPaths() {
+        RequestCycle requestCycle = RequestCycle.get();
+        Map<String, String> paths = requestCycle.getMetaData(PATHS_KEY);
+        if (paths == null) {
+            paths = new HashMap<>();
+            requestCycle.setMetaData(PATHS_KEY, paths);
+        }
+        return paths;
+    }
+
     @Override
     public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag) {
-        final FilteringHeaderResponse response = FilteringHeaderResponse.get();
 
-        if (!response.isClosed()) {
-            throw new RuntimeException(
-                    "there was an error processing the header response - "
-                    + "you tried to render a bucket of response from FilteringHeaderResponse, "
-                    + "but it had not yet run and been closed. This could occur when the header "
-                    + "container that is standard in wicket renders, so perhaps you have done "
-                    + "something to keep that from rendering?");
-        }
-
-        final String configPaths = response.getContent(filterName()).toString();
         final StringBuilder content = new StringBuilder();
 
         try {
@@ -84,12 +97,8 @@ class RequireJsConfig extends HeaderResponseContainer {
             paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
             paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
 
-            String[] items = Strings.split(configPaths, '\n');
-            for (String item : items) {
-                if (!Strings.isEmpty(item)) {
-                    String[] parts = Strings.split(item, '=');
-                    paths.put(parts[0], parts[1]);
-                }
+            for (Map.Entry<String, String> p : getPaths().entrySet()) {
+                paths.put(p.getKey(), p.getValue());
             }
 
             content.append("<script>\nvar require = ");

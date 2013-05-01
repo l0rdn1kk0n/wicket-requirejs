@@ -3,8 +3,6 @@ package de.agilecoders.wicket.requirejs;
 import de.agilecoders.wicket.webjars.util.WicketWebjars;
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.IHeaderResponseDecorator;
 
 /**
  * Bootstrap class that adds the {@link IRequireJsSettings} to an {@link Application} and
@@ -37,13 +35,6 @@ public final class RequireJs {
      */
     public static void install(final Application application, final IRequireJsSettings settings) {
         application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
-
-        application.setHeaderResponseDecorator(new IHeaderResponseDecorator() {
-            @Override
-            public IHeaderResponse decorate(IHeaderResponse response) {
-                return new FilteringHeaderResponse(response);
-            }
-        });
 
         WicketWebjars.install(application);
     }
