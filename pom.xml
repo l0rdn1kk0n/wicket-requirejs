@@ -10,7 +10,7 @@
 
     <groupId>de.agilecoders.wicket.requirejs</groupId>
     <artifactId>wicket-requirejs</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
 
     <description>wicket with require.js integration</description>
     <url>https://github.com/l0rdn1kk0n/wicket-requirejs</url>
