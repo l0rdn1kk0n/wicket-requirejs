@@ -4,7 +4,7 @@ import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceR
 import org.apache.wicket.request.resource.ResourceReference;
 
 /**
- * TODO miha: document class purpose
+ * Default implementation of {@link IRequireJsSettings}.
  *
  * @author miha
  */
@@ -15,6 +15,11 @@ public class RequireJsSettings implements IRequireJsSettings {
     @Override
     public ResourceReference getResourceReference() {
         return resourceReference;
+    }
+
+    @Override
+    public String getFilterName() {
+        return "require-js-config";
     }
 
 }

@@ -7,7 +7,8 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.IHeaderResponseDecorator;
 
 /**
- * TODO miha: document class purpose
+ * Bootstrap class that adds the {@link IRequireJsSettings} to an {@link Application} and
+ * provides access to them via a static getter method {@link #settings()}/{@link #settings(org.apache.wicket.Application)}.
  *
  * @author miha
  */
@@ -32,16 +33,14 @@ public final class RequireJs {
      * installs given settings to given application
      *
      * @param application current application assigned to this thread
-     * @param settings the configuration settings for RequireJs
+     * @param settings    the configuration settings for RequireJs
      */
     public static void install(final Application application, final IRequireJsSettings settings) {
         application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
 
-        application.setHeaderResponseDecorator(new IHeaderResponseDecorator()
-        {
+        application.setHeaderResponseDecorator(new IHeaderResponseDecorator() {
             @Override
-            public IHeaderResponse decorate(IHeaderResponse response)
-            {
+            public IHeaderResponse decorate(IHeaderResponse response) {
                 return new FilteringHeaderResponse(response);
             }
         });
@@ -60,7 +59,7 @@ public final class RequireJs {
         final IRequireJsSettings settings = application.getMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY);
 
         if (settings == null) {
-            throw new IllegalStateException("you've forgot to install your requirejs settings. "
+            throw new IllegalStateException("you've forgot to install your require.js settings. "
                                             + "Please call RequireJs#install() in your Application#init() method.");
         }
 

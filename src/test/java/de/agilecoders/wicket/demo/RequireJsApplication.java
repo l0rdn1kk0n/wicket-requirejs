@@ -27,7 +27,7 @@ public class RequireJsApplication extends WebApplication
 
 		RequireJs.install(this);
 
-		getResourceBundles().addJavaScriptBundle(RequireJsApplication.class, "bundee.js",
+		getResourceBundles().addJavaScriptBundle(RequireJsApplication.class, "bundle.js",
 			new JavaScriptResourceReference(HomePage.class, "demo1.js"),
 			new JavaScriptResourceReference(PageB.class, "pageB.js")
 		);

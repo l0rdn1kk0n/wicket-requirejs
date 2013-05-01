@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.requirejs;
 
+import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONException;
 import org.apache.wicket.ajax.json.JSONObject;
@@ -10,76 +11,95 @@ import org.apache.wicket.settings.IJavaScriptLibrarySettings;
 import org.apache.wicket.util.string.Strings;
 
 /**
+ * The {@link RequireJsConfig} renders the javascript configuration object that is used
+ * by require.js to locate resources and to resolve their dependencies.
  *
+ * @author martin-g
+ * @author miha
  */
-class RequireJsConfig extends HeaderResponseContainer
-{
-	static final String FILTER_NAME = "require-js-config";
+class RequireJsConfig extends HeaderResponseContainer {
+    private static final String KEY_SHIM = "shim";
+    private static final String KEY_DEPS = "deps";
+    private static final String KEY_EXPORTS = "exports";
+    private static final String KEY_PATHS = "paths";
 
-	public RequireJsConfig()
-	{
-		super("config", FILTER_NAME);
-	}
+    private static final String ID_WICKET = "Wicket";
+    private static final String ID_WICKET_EVENT = "wicket-event";
+    private static final String ID_JQUERY = "jquery";
 
-	@Override
-	public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag)
-	{
-		FilteringHeaderResponse response = FilteringHeaderResponse.get();
-		if (!response.isClosed())
-		{
-			throw new RuntimeException(
-					"there was an error processing the header response - you tried to render a bucket of response from FilteringHeaderResponse, but it had not yet run and been closed.  this should occur when the header container that is standard in wicket renders, so perhaps you have done something to keep that from rendering?");
-		}
+    /**
+     * @return the require.js filter name that is used to filter all resource
+     *         references that should be used
+     */
+    static String filterName() {
+        return RequireJs.settings().getFilterName();
+    }
 
-		String configPaths = response.getContent(FILTER_NAME).toString();
+    /**
+     * Construct.
+     *
+     * @param id component id
+     */
+    public RequireJsConfig(final String id) {
+        super(id, filterName());
+    }
 
-		StringBuilder content = new StringBuilder();
+    @Override
+    public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag) {
+        final FilteringHeaderResponse response = FilteringHeaderResponse.get();
 
-		try
-		{
-			JSONObject requireConfig = new JSONObject();
+        if (!response.isClosed()) {
+            throw new RuntimeException(
+                    "there was an error processing the header response - "
+                    + "you tried to render a bucket of response from FilteringHeaderResponse, "
+                    + "but it had not yet run and been closed. This could occur when the header "
+                    + "container that is standard in wicket renders, so perhaps you have done "
+                    + "something to keep that from rendering?");
+        }
 
-			JSONObject shim = new JSONObject();
-			requireConfig.put("shim", shim);
+        final String configPaths = response.getContent(filterName()).toString();
+        final StringBuilder content = new StringBuilder();
 
-			JSONObject shimWicketEvent = new JSONObject();
-			shim.put("wicket-event", shimWicketEvent);
-			shimWicketEvent.put("deps", new JSONArray("[jquery]"));
-			shimWicketEvent.put("exports", "wicket-event");
+        try {
+            JSONObject requireConfig = new JSONObject();
 
-			JSONObject shimWicket = new JSONObject();
-			shim.put("Wicket", shimWicket);
-			shimWicket.put("deps", new JSONArray("[wicket-event]"));
-			shimWicket.put("exports", "Wicket");
+            JSONObject shim = new JSONObject();
+            requireConfig.put(KEY_SHIM, shim);
 
-			JSONObject paths = new JSONObject();
-			requireConfig.put("paths", paths);
+            JSONObject shimWicketEvent = new JSONObject();
+            shim.put(ID_WICKET_EVENT, shimWicketEvent);
+            shimWicketEvent.put(KEY_DEPS, new JSONArray("[" + ID_JQUERY + "]"));
+            shimWicketEvent.put(KEY_EXPORTS, ID_WICKET_EVENT);
 
-			IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
-			paths.put("jquery", urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
-			paths.put("wicket-event", urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
-			paths.put("Wicket", urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
+            JSONObject shimWicket = new JSONObject();
+            shim.put(ID_WICKET, shimWicket);
+            shimWicket.put(KEY_DEPS, new JSONArray("[" + ID_WICKET_EVENT + "]"));
+            shimWicket.put(KEY_EXPORTS, ID_WICKET);
 
-			String[] items = Strings.split(configPaths, '\n');
-			for (String item : items)
-			{
-				if (Strings.isEmpty(item) == false)
-				{
-					String[] parts = Strings.split(item, '=');
-					paths.put(parts[0], parts[1]);
-				}
-			}
+            JSONObject paths = new JSONObject();
+            requireConfig.put(KEY_PATHS, paths);
 
-			content.append("<script>\nvar require = ");
-			content.append(requireConfig.toString(2)).append(';');
-			content.append("</script>\n");
-		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
-		}
+            IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
+            paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
+            paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
+            paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
 
-		replaceComponentTagBody(markupStream, openTag, content);
-	}
+            String[] items = Strings.split(configPaths, '\n');
+            for (String item : items) {
+                if (!Strings.isEmpty(item)) {
+                    String[] parts = Strings.split(item, '=');
+                    paths.put(parts[0], parts[1]);
+                }
+            }
+
+            content.append("<script>\nvar require = ");
+            content.append(requireConfig.toString(2)).append(';');
+            content.append("</script>\n");
+        } catch (JSONException e) {
+            throw new WicketRuntimeException(e);
+        }
+
+        replaceComponentTagBody(markupStream, openTag, content);
+    }
 
 }
