@@ -81,6 +81,42 @@ public MyPage extends WebPage {
 </html>
 ```
 
+The RequireJsPanel will render a special require.js script tag to the page that contains all added AmdJavaScriptHeaderItem and their dependencies:
+
+```html
+<script>
+   var require = {
+     "paths": {
+       "demo": "./wicket/resource/de.agilecoders.wicket.demo.RequireJsApplication/bundle-ver-1367476208000.js",
+       "wicket-event": "./wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery-ver-1366300990000.js",
+       "pageB": "./wicket/resource/de.agilecoders.wicket.demo.RequireJsApplication/bundle-ver-1367476208000.js",
+       "Wicket": "./wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery-ver-1366300990000.js",
+       "jquery": "./wicket/resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-ver-1366300990000.js"
+     },
+     "shim": {
+       "wicket-event": {
+         "exports": "wicket-event",
+         "deps": ["jquery"]
+       },
+       "Wicket": {
+         "exports": "Wicket",
+         "deps": ["wicket-event"]
+       }
+     }
+   };
+</script>
+```
+
+None of the AMD resources will be loaded directly, instead they are loaded as requested.
+
+```html
+<script type="text/javascript">
+    require( ['pageB'], function(pageB) { // this will load the resource with id 'pageB' (./wicket/resource/de.agilecoders.wicket.demo.RequireJsApplication/bundle-ver-1367476208000.js)
+        pageB.demo(); // this will be executed after 'pageB' was loaded
+    });
+</script>
+```
+
 How to get help and news
 ------------------------
 
