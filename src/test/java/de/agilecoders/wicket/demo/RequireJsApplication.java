@@ -36,6 +36,6 @@ public class RequireJsApplication extends WebApplication
 	@Override
 	public RuntimeConfigurationType getConfigurationType()
 	{
-		return RuntimeConfigurationType.DEVELOPMENT;
+		return RuntimeConfigurationType.DEPLOYMENT;
 	}
 }

@@ -3,6 +3,7 @@ package de.agilecoders.wicket.requirejs;
 import org.apache.wicket.Application;
 import org.apache.wicket.ResourceBundles;
 import org.apache.wicket.markup.head.HeaderItem;
+import org.apache.wicket.markup.head.IReferenceHeaderItem;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.request.IRequestHandler;
@@ -11,6 +12,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceReferenceRequestHandler;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.lang.Args;
 
 import java.util.Collections;
 import java.util.Map;
@@ -20,7 +22,7 @@ import java.util.Map;
  *
  * @author martin-g
  */
-public class AmdJavaScriptHeaderItem extends HeaderItem {
+public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHeaderItem {
 
     /**
      * Creates a {@link AmdJavaScriptHeaderItem} for the given reference.
@@ -60,13 +62,13 @@ public class AmdJavaScriptHeaderItem extends HeaderItem {
      * @param name      name that will be used as AMD identifier
      */
     public AmdJavaScriptHeaderItem(JavaScriptResourceReference reference, String name) {
-        this.name = name;
-        this.reference = reference;
+        this.reference = Args.notNull(reference, "reference");
+        this.name = Args.notNull(name, "name");
     }
 
     @Override
     public Iterable<?> getRenderTokens() {
-        return Collections.singletonList("amd-javascript-" + name);
+        return Collections.singletonList("amd-javascript-" + getName());
     }
 
     @Override
@@ -83,7 +85,7 @@ public class AmdJavaScriptHeaderItem extends HeaderItem {
 
         if (Application.exists()) {
             ResourceBundles resourceBundles = Application.get().getResourceBundles();
-            HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(reference, name));
+            HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(getReference(), getName()));
 
             if (bundleItem instanceof JavaScriptReferenceHeaderItem) {
                 JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
@@ -93,7 +95,7 @@ public class AmdJavaScriptHeaderItem extends HeaderItem {
         }
 
         if (handler == null) {
-            handler = new ResourceReferenceRequestHandler(reference, null);
+            handler = new ResourceReferenceRequestHandler(getReference(), null);
         }
 
         return RequestCycle.get().urlFor(handler).toString();
@@ -104,5 +106,10 @@ public class AmdJavaScriptHeaderItem extends HeaderItem {
      */
     public String getName() {
         return name;
+    }
+
+    @Override
+    public ResourceReference getReference() {
+        return reference;
     }
 }

@@ -1,13 +1,16 @@
 package de.agilecoders.wicket.requirejs;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONException;
 import org.apache.wicket.ajax.json.JSONObject;
+import org.apache.wicket.core.util.string.JavaScriptUtils;
+import org.apache.wicket.feedback.IFeedback;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
-import org.apache.wicket.markup.head.filter.HeaderResponseContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
 
@@ -21,7 +24,7 @@ import java.util.Map;
  * @author martin-g
  * @author miha
  */
-class RequireJsConfig extends HeaderResponseContainer {
+class RequireJsConfig extends Label implements IFeedback {
 
     /**
      * A key used to store the paths for all AMD modules in a request cycle
@@ -39,20 +42,12 @@ class RequireJsConfig extends HeaderResponseContainer {
     private static final String ID_JQUERY = "jquery";
 
     /**
-     * @return the require.js filter name that is used to filter all resource
-     *         references that should be used
-     */
-    static String filterName() {
-        return RequireJs.settings().getFilterName();
-    }
-
-    /**
      * Construct.
      *
      * @param id component id
      */
     public RequireJsConfig(final String id) {
-        super(id, filterName());
+        super(id);
     }
 
     /**
@@ -92,7 +87,8 @@ class RequireJsConfig extends HeaderResponseContainer {
             JSONObject paths = new JSONObject();
             requireConfig.put(KEY_PATHS, paths);
 
-            IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
+            Application application = getApplication();
+            IJavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
             paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
             paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
             paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
@@ -101,9 +97,13 @@ class RequireJsConfig extends HeaderResponseContainer {
                 paths.put(p.getKey(), p.getValue());
             }
 
-            content.append("<script>\nvar require = ");
-            content.append(requireConfig.toString(2)).append(';');
-            content.append("</script>\n");
+            content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("var require = ");
+            if (application.usesDevelopmentConfig()) {
+                content.append(requireConfig.toString(2));
+            } else {
+                content.append(requireConfig.toString());
+            }
+            content.append(';').append(JavaScriptUtils.SCRIPT_CLOSE_TAG);
         } catch (JSONException e) {
             throw new WicketRuntimeException(e);
         }

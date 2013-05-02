@@ -17,9 +17,4 @@ public class RequireJsSettings implements IRequireJsSettings {
         return resourceReference;
     }
 
-    @Override
-    public String getFilterName() {
-        return "require-js-config";
-    }
-
 }

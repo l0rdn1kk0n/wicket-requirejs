@@ -14,9 +14,4 @@ public interface IRequireJsSettings {
      */
     ResourceReference getResourceReference();
 
-    /**
-     * @return the resource filter name that is used by {@link FilteringHeaderResponse}
-     */
-    String getFilterName();
-
 }
