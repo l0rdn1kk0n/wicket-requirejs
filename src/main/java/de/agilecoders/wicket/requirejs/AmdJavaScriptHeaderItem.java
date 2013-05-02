@@ -13,6 +13,7 @@ import org.apache.wicket.request.handler.resource.ResourceReferenceRequestHandle
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Args;
+import org.apache.wicket.util.string.Strings;
 
 import java.util.Collections;
 import java.util.Map;
@@ -73,32 +74,42 @@ public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHea
 
     @Override
     public void render(Response response) {
-        Map<String,String> paths = RequireJsConfig.getPaths();
-        paths.put(getName(), getUrl());
+        Map<String,CharSequence> paths = RequireJsConfig.getPaths();
+
+        boolean isInBundle = false;
+
+        RequestCycle requestCycle = RequestCycle.get();
+
+        ResourceBundles resourceBundles = Application.get().getResourceBundles();
+        HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(getReference(), getName()));
+
+        if (bundleItem instanceof JavaScriptReferenceHeaderItem) {
+            JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
+            ResourceReference bundleReference = jsBundleItem.getReference();
+            String bundleName = getBundleName(bundleReference);
+            paths.put(bundleName, getUrl(requestCycle, bundleReference));
+
+            Map<String, String> maps = RequireJsConfig.getMaps();
+            maps.put(getName(), bundleName);
+
+            isInBundle = true;
+        }
+
+        if (!isInBundle) {
+            paths.put(getName(), getUrl(requestCycle, getReference()));
+        }
     }
 
-    /**
-     * @return the url to this {@link HeaderItem}
-     */
-    public String getUrl() {
-        IRequestHandler handler = null;
+    private String getUrl(RequestCycle cycle, ResourceReference ref) {
+        IRequestHandler handler = new ResourceReferenceRequestHandler(ref, null);
+        String moduleUrl = cycle.urlFor(handler).toString();
+        CharSequence bundleReferenceName = moduleUrl.substring(0, moduleUrl.length() - 3);
+        return bundleReferenceName.toString();
+    }
 
-        if (Application.exists()) {
-            ResourceBundles resourceBundles = Application.get().getResourceBundles();
-            HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(getReference(), getName()));
-
-            if (bundleItem instanceof JavaScriptReferenceHeaderItem) {
-                JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
-                ResourceReference bundleReference = jsBundleItem.getReference();
-                handler = new ResourceReferenceRequestHandler(bundleReference, null);
-            }
-        }
-
-        if (handler == null) {
-            handler = new ResourceReferenceRequestHandler(getReference(), null);
-        }
-
-        return RequestCycle.get().urlFor(handler).toString();
+    private String getBundleName(ResourceReference bundleReference) {
+        CharSequence bundleReferenceName = Strings.replaceAll(bundleReference.getName(), ".", "-");
+        return bundleReferenceName.toString();
     }
 
     /**

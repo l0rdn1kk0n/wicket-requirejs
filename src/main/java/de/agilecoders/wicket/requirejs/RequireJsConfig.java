@@ -29,7 +29,10 @@ class RequireJsConfig extends Label implements IFeedback {
     /**
      * A key used to store the paths for all AMD modules in a request cycle
      */
-    private static final MetaDataKey<Map<String, String>> PATHS_KEY = new MetaDataKey<Map<String, String>>() {
+    private static final MetaDataKey<Map<String, CharSequence>> PATHS_KEY = new MetaDataKey<Map<String, CharSequence>>() {
+    };
+
+    private static final MetaDataKey<Map<String, String>> MAP_KEY = new MetaDataKey<Map<String, String>>() {
     };
 
     private static final String KEY_SHIM = "shim";
@@ -53,15 +56,28 @@ class RequireJsConfig extends Label implements IFeedback {
     /**
      * @return a map that stores all amdModuleName -> amdModuleUrl per request cycle
      */
-    public static Map<String, String> getPaths() {
+    public static Map<String, CharSequence> getPaths() {
         RequestCycle requestCycle = RequestCycle.get();
-        Map<String, String> paths = requestCycle.getMetaData(PATHS_KEY);
+        Map<String, CharSequence> paths = requestCycle.getMetaData(PATHS_KEY);
         if (paths == null) {
             paths = new HashMap<>();
             requestCycle.setMetaData(PATHS_KEY, paths);
         }
         return paths;
     }
+    /**
+     * @return a map that stores all amdModuleName -> amdModuleUrl per request cycle
+     */
+    public static Map<String, String> getMaps() {
+        RequestCycle requestCycle = RequestCycle.get();
+        Map<String, String> maps = requestCycle.getMetaData(MAP_KEY);
+        if (maps == null) {
+            maps = new HashMap<>();
+            requestCycle.setMetaData(MAP_KEY, maps);
+        }
+        return maps;
+    }
+
 
     @Override
     public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag) {
@@ -70,6 +86,19 @@ class RequireJsConfig extends Label implements IFeedback {
 
         try {
             JSONObject requireConfig = new JSONObject();
+
+            Map<String, String> mappings = getMaps();
+            if (!mappings.isEmpty()) {
+                JSONObject map = new JSONObject();
+                requireConfig.put("map", map);
+
+                JSONObject all = new JSONObject();
+                map.put("*", all);
+
+                for (Map.Entry<String, String> mapping : mappings.entrySet()) {
+                    all.put(mapping.getKey(), mapping.getValue());
+                }
+            }
 
             JSONObject shim = new JSONObject();
             requireConfig.put(KEY_SHIM, shim);
@@ -93,7 +122,7 @@ class RequireJsConfig extends Label implements IFeedback {
             paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
             paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
 
-            for (Map.Entry<String, String> p : getPaths().entrySet()) {
+            for (Map.Entry<String, CharSequence> p : getPaths().entrySet()) {
                 paths.put(p.getKey(), p.getValue());
             }
 
