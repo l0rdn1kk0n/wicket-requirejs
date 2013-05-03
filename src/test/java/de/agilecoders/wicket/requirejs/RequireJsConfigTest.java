@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.regex.Pattern;
 
 /**
- * TODO miha: document class purpose
+ * Tests the {@link RequireJsConfig} component
  *
  * @author miha
  */
@@ -19,22 +19,22 @@ public class RequireJsConfigTest extends WicketApplicationTest {
         tester().startComponentInPage(new RequireJsConfig("id"));
 
         tester().assertContains(Pattern.quote("var require = {\n"
-                                + "  \"paths\": {\n"
-                                + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
-                                + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
-                                + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery.js\"\n"
-                                + "  },\n"
-                                + "  \"shim\": {\n"
-                                + "    \"wicket-event\": {\n"
-                                + "      \"exports\": \"wicket-event\",\n"
-                                + "      \"deps\": [\"jquery\"]\n"
-                                + "    },\n"
-                                + "    \"Wicket\": {\n"
-                                + "      \"exports\": \"Wicket\",\n"
-                                + "      \"deps\": [\"wicket-event\"]\n"
-                                + "    }\n"
-                                + "  }\n"
-                                + "};"));
+                                              + "  \"paths\": {\n"
+                                              + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
+                                              + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
+                                              + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery.js\"\n"
+                                              + "  },\n"
+                                              + "  \"shim\": {\n"
+                                              + "    \"wicket-event\": {\n"
+                                              + "      \"exports\": \"wicket-event\",\n"
+                                              + "      \"deps\": [\"jquery\"]\n"
+                                              + "    },\n"
+                                              + "    \"Wicket\": {\n"
+                                              + "      \"exports\": \"Wicket\",\n"
+                                              + "      \"deps\": [\"wicket-event\"]\n"
+                                              + "    }\n"
+                                              + "  }\n"
+                                              + "};"));
     }
 
     @Test
