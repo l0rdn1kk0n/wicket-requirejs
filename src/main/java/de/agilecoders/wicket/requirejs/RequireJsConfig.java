@@ -1,6 +1,5 @@
 package de.agilecoders.wicket.requirejs;
 
-import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
@@ -65,7 +64,6 @@ class RequireJsConfig extends Label implements IFeedback {
 
     @Override
     public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag) {
-
         final StringBuilder content = new StringBuilder();
 
         try {
@@ -74,41 +72,52 @@ class RequireJsConfig extends Label implements IFeedback {
             JSONObject shim = new JSONObject();
             requireConfig.put(KEY_SHIM, shim);
 
-            JSONObject shimWicketEvent = new JSONObject();
-            shim.put(ID_WICKET_EVENT, shimWicketEvent);
-            shimWicketEvent.put(KEY_DEPS, new JSONArray("[" + ID_JQUERY + "]"));
-            shimWicketEvent.put(KEY_EXPORTS, ID_WICKET_EVENT);
-
-            JSONObject shimWicket = new JSONObject();
-            shim.put(ID_WICKET, shimWicket);
-            shimWicket.put(KEY_DEPS, new JSONArray("[" + ID_WICKET_EVENT + "]"));
-            shimWicket.put(KEY_EXPORTS, ID_WICKET);
+            addShim(shim);
 
             JSONObject paths = new JSONObject();
             requireConfig.put(KEY_PATHS, paths);
 
-            Application application = getApplication();
-            IJavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
-            paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
-            paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
-            paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
+            addJsLibraryPaths(paths);
+            addPaths(paths, getPaths());
 
-            for (Map.Entry<String, String> p : getPaths().entrySet()) {
-                paths.put(p.getKey(), p.getValue());
-            }
-
-            content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("var require = ");
-            if (application.usesDevelopmentConfig()) {
+            content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("require.config(");
+            if (getApplication().usesDevelopmentConfig()) {
                 content.append(requireConfig.toString(2));
             } else {
                 content.append(requireConfig.toString());
             }
-            content.append(';').append(JavaScriptUtils.SCRIPT_CLOSE_TAG);
+            content.append(')').append(';').append(JavaScriptUtils.SCRIPT_CLOSE_TAG);
         } catch (JSONException e) {
             throw new WicketRuntimeException(e);
         }
 
         replaceComponentTagBody(markupStream, openTag, content);
+    }
+
+    protected void addShim(JSONObject shim) throws JSONException {
+        JSONObject shimWicketEvent = new JSONObject();
+        shim.put(ID_WICKET_EVENT, shimWicketEvent);
+        shimWicketEvent.put(KEY_DEPS, new JSONArray("[" + ID_JQUERY + "]"));
+        shimWicketEvent.put(KEY_EXPORTS, ID_WICKET_EVENT);
+
+        JSONObject shimWicket = new JSONObject();
+        shim.put(ID_WICKET, shimWicket);
+        shimWicket.put(KEY_DEPS, new JSONArray("[" + ID_WICKET_EVENT + "]"));
+        shimWicket.put(KEY_EXPORTS, ID_WICKET);
+    }
+
+    protected void addPaths(JSONObject paths, Map<String, String> pathElements) throws JSONException {
+        for (Map.Entry<String, String> p : pathElements.entrySet()) {
+            paths.put(p.getKey(), p.getValue());
+        }
+    }
+
+    protected void addJsLibraryPaths(JSONObject paths) throws JSONException {
+        IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
+
+        paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
+        paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
+        paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
     }
 
 }

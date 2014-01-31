@@ -8,9 +8,9 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 Dependencies
 ------------
 
-* Apache Wicket 6.7.0
-* wicket-webjars 0.2.0
-* require.js 2.1.5
+* Apache Wicket 6.13.0
+* wicket-webjars 0.3.4
+* require.js 2.1.10
 
 Usage
 -----
@@ -47,7 +47,7 @@ public MyPage extends WebPage {
     public MyPage(PaeParameters params) {
         super(params);
 
-        add(new RequireJsPanel("require.js"));
+        add(new RequireJsPanel("requireJs"));
     }
 
     @Override
@@ -85,7 +85,7 @@ The RequireJsPanel will render a special require.js script tag to the page that 
 
 ```html
 <script>
-   var require = {
+   require.config({
      "paths": {
        "demo": "./wicket/resource/de.agilecoders.wicket.demo.RequireJsApplication/bundle-ver-1367476208000.js",
        "wicket-event": "./wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery-ver-1366300990000.js",
@@ -103,7 +103,7 @@ The RequireJsPanel will render a special require.js script tag to the page that 
          "deps": ["wicket-event"]
        }
      }
-   };
+   });
 </script>
 ```
 

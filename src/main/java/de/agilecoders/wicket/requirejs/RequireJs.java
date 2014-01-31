@@ -1,6 +1,6 @@
 package de.agilecoders.wicket.requirejs;
 
-import de.agilecoders.wicket.webjars.util.WicketWebjars;
+import de.agilecoders.wicket.webjars.WicketWebjars;
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 
