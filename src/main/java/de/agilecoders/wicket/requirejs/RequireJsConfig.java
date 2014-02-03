@@ -58,8 +58,13 @@ class RequireJsConfig extends Label implements IFeedback {
         Application application = Application.get();
         Map<String, String> mappings = application.getMetaData(PATHS_KEY);
         if (mappings == null) {
-            mappings = new HashMap<>();
-            application.setMetaData(PATHS_KEY, mappings);
+            synchronized (RequireJsConfig.class) {
+                mappings = application.getMetaData(PATHS_KEY);
+                if (mappings == null) {
+                    mappings = new HashMap<>();
+                    application.setMetaData(PATHS_KEY, mappings);
+                }
+            }
         }
         return mappings;
     }
