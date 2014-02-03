@@ -20,7 +20,12 @@ public class RequireJsConfigTest extends WicketApplicationTest {
         tester().startComponentInPage(new RequireJsConfig("id"));
 
         tester().assertContains(Pattern.quote("require.config({\n"
-                                              + "  \"baseUrl\": \"../requirejs/\",\n"
+                                              + "  \"baseUrl\": \"..//\",\n"
+                                              + "  \"paths\": {\n"
+                                              + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
+                                              + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
+                                              + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-1.10.2.js\"\n"
+                                              + "  },\n"
                                               + "  \"shim\": {\n"
                                               + "    \"wicket-event\": {\n"
                                               + "      \"exports\": \"wicket-event\",\n"
@@ -31,7 +36,7 @@ public class RequireJsConfigTest extends WicketApplicationTest {
                                               + "      \"deps\": [\"wicket-event\"]\n"
                                               + "    }\n"
                                               + "  },\n"
-                                              + "  \"mappings\": {}\n"
+                                              + "  \"mountPath\": \"./requirejs\"\n"
                                               + "});"));
     }
 
