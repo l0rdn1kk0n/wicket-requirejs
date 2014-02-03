@@ -15,7 +15,7 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.Url;
-import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.UrlRenderer;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
 
 /**
@@ -36,6 +36,7 @@ class RequireJsConfig extends Label implements IFeedback {
     private static final String KEY_SHIM = "shim";
     private static final String KEY_DEPS = "deps";
     private static final String KEY_EXPORTS = "exports";
+    private static final String KEY_PATHS = "paths";
 
     private static final String ID_WICKET = "Wicket";
     private static final String ID_WICKET_EVENT = "wicket-event";
@@ -70,18 +71,21 @@ class RequireJsConfig extends Label implements IFeedback {
         try {
             JSONObject requireConfig = new JSONObject();
 
-            requireConfig.put("baseUrl", getRequestCycle().getUrlRenderer().renderRelativeUrl(Url.parse("requirejs")) + "/");
+            IRequireJsSettings requireJsSettings = RequireJs.settings(getApplication());
+            UrlRenderer urlRenderer = getRequestCycle().getUrlRenderer();
 
-            JSONObject mappings = new JSONObject();
-            requireConfig.put("mappings", mappings);
+            String mountPath = requireJsSettings.getMountPath();
+            String relativeMountPathUrl = urlRenderer.renderRelativeUrl(Url.parse(mountPath));
+            requireConfig.put("mountPath", relativeMountPathUrl);
 
-            for (Map.Entry<String, String> mapping : getMappings().entrySet()) {
-                mappings.put(mapping.getKey(), mapping.getValue());
-            }
+            String baseUrl = urlRenderer.renderRelativeUrl(Url.parse("/"));
+            requireConfig.put("baseUrl", baseUrl);
 
-            requireConfig.put(KEY_SHIM, configureShims());
+            configureMappings(requireConfig);
 
-            registerJsLibraries();
+            configureShims(requireConfig);
+
+            configurePaths(requireConfig);
 
             content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("require.config(");
             if (getApplication().usesDevelopmentConfig()) {
@@ -97,6 +101,18 @@ class RequireJsConfig extends Label implements IFeedback {
         replaceComponentTagBody(markupStream, openTag, content);
     }
 
+    protected void configureMappings(JSONObject requireJsConfig) throws JSONException {
+        Map<String, String> mappings = getMappings();
+        if (!mappings.isEmpty()) {
+            JSONObject mappingsJson = new JSONObject();
+            requireJsConfig.put("mappings", mappingsJson);
+
+            for (Map.Entry<String, String> mapping : mappings.entrySet()) {
+                mappingsJson.put(mapping.getKey(), mapping.getValue());
+            }
+        }
+    }
+
     /**
      * Adds 'shim' to require.js config that loads 'Wicket' as a global variable
      * and configures a dependency to 'wicket-event'.
@@ -105,7 +121,7 @@ class RequireJsConfig extends Label implements IFeedback {
      *
      * @throws JSONException
      */
-    protected JSONObject configureShims() throws JSONException {
+    protected void configureShims(JSONObject requireJsConfig) throws JSONException {
         JSONObject shim = new JSONObject();
 
         JSONObject shimWicketEvent = new JSONObject();
@@ -118,19 +134,18 @@ class RequireJsConfig extends Label implements IFeedback {
         shimWicket.put(KEY_DEPS, new JSONArray("[" + ID_WICKET_EVENT + "]"));
         shimWicket.put(KEY_EXPORTS, ID_WICKET);
 
-        return shim;
+        requireJsConfig.put(KEY_SHIM, shim);
     }
 
-    /**
-     * Registers JQuery, WicketAjax and WicketEvent in the AMD module registry
-     */
-    protected void registerJsLibraries() {
+    protected void configurePaths(JSONObject requireJsConfig) throws JSONException {
+        JSONObject paths = new JSONObject();
+
         IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
-        IRequireJsSettings settings = RequireJs.settings();
-        AmdModulesRegistry modulesRegistry = settings.getModulesRegistry();
-        modulesRegistry.register(ID_JQUERY, (JavaScriptResourceReference) javaScriptLibrarySettings.getJQueryReference());
-        modulesRegistry.register(ID_WICKET_EVENT, (JavaScriptResourceReference) javaScriptLibrarySettings.getWicketEventReference());
-        modulesRegistry.register(ID_WICKET, (JavaScriptResourceReference) javaScriptLibrarySettings.getWicketAjaxReference());
-    }
 
+        paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
+        paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
+        paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
+
+        requireJsConfig.put(KEY_PATHS, paths);
+    }
 }

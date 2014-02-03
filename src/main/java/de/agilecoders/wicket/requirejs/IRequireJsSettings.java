@@ -17,4 +17,17 @@ public interface IRequireJsSettings {
     IRequireJsSettings setResourceReference(ResourceReference reference);
 
     AmdModulesRegistry getModulesRegistry();
+
+    /**
+     * @param mountPath The mount path that {@link de.agilecoders.wicket.requirejs.RequireJsMapper}
+     *                  should use.
+     * @return {@code this} instance, for chaining
+     */
+    IRequireJsSettings setMountPath(String mountPath);
+
+    /**
+     * @return The mount path that {@link de.agilecoders.wicket.requirejs.RequireJsMapper}
+     *                  should use.
+     */
+    String getMountPath();
 }

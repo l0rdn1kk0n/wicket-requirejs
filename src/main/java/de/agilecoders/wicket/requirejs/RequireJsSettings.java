@@ -1,7 +1,9 @@
 package de.agilecoders.wicket.requirejs;
 
-import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.lang.Args;
+
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 
 /**
  * Default implementation of {@link IRequireJsSettings}.
@@ -15,6 +17,8 @@ public class RequireJsSettings implements IRequireJsSettings {
     private ResourceReference requireJsReference = DEFAULT_REFERENCE;
 
     private AmdModulesRegistry registry = new AmdModulesRegistry();
+
+    private String mountPath = "wicket/requirejs";
 
     @Override
     public ResourceReference getResourceReference() {
@@ -30,6 +34,20 @@ public class RequireJsSettings implements IRequireJsSettings {
     @Override
     public AmdModulesRegistry getModulesRegistry() {
         return registry;
+    }
+
+    @Override
+    public IRequireJsSettings setMountPath(String mountPath) {
+        this.mountPath = Args.notEmpty(mountPath, "mountPath");
+        if ("/".equals(mountPath)) {
+            throw new IllegalArgumentException("Cannot mount RequireJsMapper at the root!");
+        }
+        return this;
+    }
+
+    @Override
+    public String getMountPath() {
+        return mountPath;
     }
 
 }

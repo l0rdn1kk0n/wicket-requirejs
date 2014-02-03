@@ -11,15 +11,36 @@ import org.apache.wicket.request.resource.ResourceReference;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * A special {@link org.apache.wicket.request.IRequestMapper} that is used
+ * to resolve AMD modules requested with with RequireJs 'wicket' plugin.
+ * E.g.:
+ * <pre><code>
+ * require( ['wicket!demo', "wicket!pageB", "wicket!pageC"], function(demo, pageB, pageC) {
+ * </code></pre>
+ * will make requests to this mapper for modules 'demo', 'pageB' and 'pageC'.
+ * RequireJsMapper will use the {@link IRequireJsSettings#getModulesRegistry() registry}
+ * to find the {@link org.apache.wicket.request.resource.JavaScriptResourceReference}
+ * for each module.
  *
+ * The modules are registered by {@link de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem}
+ *
+ * @see de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem
  */
 public class RequireJsMapper extends MountMapper {
 
-    public RequireJsMapper(String mountPath) {
-        super(mountPath, new RequireJsRequestHandler());
+    public RequireJsMapper(IRequireJsSettings settings) {
+        super(settings.getMountPath(), new RequireJsRequestHandler(settings));
     }
 
     private static class RequireJsRequestHandler implements IRequestHandler {
+
+        private final IRequireJsSettings settings;
+        private final int mountPathSegmentsNumber;
+
+        private RequireJsRequestHandler(IRequireJsSettings settings) {
+            this.settings = settings;
+            this.mountPathSegmentsNumber = Url.parse(settings.getMountPath()).getSegments().size();
+        }
 
         @Override
         public void respond(IRequestCycle requestCycle) {
@@ -27,14 +48,11 @@ public class RequireJsMapper extends MountMapper {
 
             if (url.getSegments().size() > 1) {
                 Url resourceUrl = new Url(url);
-                resourceUrl.getSegments().remove(0);
+                resourceUrl.removeLeadingSegments(mountPathSegmentsNumber);
+
 
                 String moduleName = resourceUrl.toString();
-                if (moduleName.endsWith(".js")) {
-                    moduleName = moduleName.substring(0, moduleName.length() - 3);
-                }
 
-                IRequireJsSettings settings = RequireJs.settings();
                 AmdModulesRegistry modulesRegistry = settings.getModulesRegistry();
                 ResourceReference reference = modulesRegistry.getReference(moduleName);
 

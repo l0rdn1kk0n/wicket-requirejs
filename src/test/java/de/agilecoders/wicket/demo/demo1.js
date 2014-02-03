@@ -1,4 +1,4 @@
-define("demo", ["wicket!Wicket"], function(w) {
+define(["Wicket"], function(w) {
 	return {
 		unnamed: function() {
 			"use strict";

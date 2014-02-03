@@ -1,4 +1,4 @@
-define("pageC", ["wicket!jquery", "wicket!Wicket"], function($, w) {
+define(["jquery", "Wicket"], function($, w) {
 	return {
 		demo: function() {
 			"use strict";
