@@ -21,6 +21,6 @@ public class PageC extends WebPage
 	{
 		super.renderHead(response);
 
-		response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(PageB.class, "pageB.js"), "pageB"));
+		response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(PageC.class, "pageC.js"), "pageC"));
 	}
 }

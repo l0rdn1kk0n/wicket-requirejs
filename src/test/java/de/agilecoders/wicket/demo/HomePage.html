@@ -9,9 +9,11 @@
   <div wicket:id="requireJs"></div>
 
   <script type="text/javascript">
-      require( ['demo', "pageB"], function(demo, pageB) {
-          demo.demo();
-          pageB.demo();
+
+      require( ['wicket!demo', "wicket!pageB", "wicket!pageC"], function(demo, pageB, pageC) {
+          demo.unnamed();
+          pageB.b();
+          pageC.demo();
       });
   </script>
 

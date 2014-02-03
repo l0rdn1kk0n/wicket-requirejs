@@ -1,6 +1,7 @@
 package de.agilecoders.wicket.demo;
 
 import de.agilecoders.wicket.requirejs.RequireJs;
+import de.agilecoders.wicket.requirejs.RequireJsMapper;
 import org.apache.wicket.Page;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -27,15 +28,19 @@ public class RequireJsApplication extends WebApplication
 
 		RequireJs.install(this);
 
-		getResourceBundles().addJavaScriptBundle(RequireJsApplication.class, "bundle.js",
-			new JavaScriptResourceReference(HomePage.class, "demo1.js"),
-			new JavaScriptResourceReference(PageB.class, "pageB.js")
-		);
+		if (usesDeploymentConfig()) {
+			getResourceBundles().addJavaScriptBundle(RequireJsApplication.class, "bundle.js",
+				new JavaScriptResourceReference(HomePage.class, "demo1.js"),
+				new JavaScriptResourceReference(PageB.class, "pageB.js")
+			);
+		}
+
+		mount(new RequireJsMapper("requirejs"));
 	}
 
-	@Override
-	public RuntimeConfigurationType getConfigurationType()
-	{
-		return RuntimeConfigurationType.DEPLOYMENT;
-	}
+//	@Override
+//	public RuntimeConfigurationType getConfigurationType()
+//	{
+//		return RuntimeConfigurationType.DEPLOYMENT;
+//	}
 }

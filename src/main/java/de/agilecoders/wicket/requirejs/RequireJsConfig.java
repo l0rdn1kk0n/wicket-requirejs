@@ -1,5 +1,9 @@
 package de.agilecoders.wicket.requirejs;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
@@ -10,11 +14,9 @@ import org.apache.wicket.feedback.IFeedback;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The {@link RequireJsConfig} renders the javascript configuration object that is used
@@ -34,7 +36,6 @@ class RequireJsConfig extends Label implements IFeedback {
     private static final String KEY_SHIM = "shim";
     private static final String KEY_DEPS = "deps";
     private static final String KEY_EXPORTS = "exports";
-    private static final String KEY_PATHS = "paths";
 
     private static final String ID_WICKET = "Wicket";
     private static final String ID_WICKET_EVENT = "wicket-event";
@@ -52,14 +53,14 @@ class RequireJsConfig extends Label implements IFeedback {
     /**
      * @return a map that stores all amdModuleName -> amdModuleUrl per request cycle
      */
-    public static Map<String, String> getPaths() {
-        RequestCycle requestCycle = RequestCycle.get();
-        Map<String, String> paths = requestCycle.getMetaData(PATHS_KEY);
-        if (paths == null) {
-            paths = new HashMap<>();
-            requestCycle.setMetaData(PATHS_KEY, paths);
+    public static Map<String, String> getMappings() {
+        Application application = Application.get();
+        Map<String, String> mappings = application.getMetaData(PATHS_KEY);
+        if (mappings == null) {
+            mappings = new HashMap<>();
+            application.setMetaData(PATHS_KEY, mappings);
         }
-        return paths;
+        return mappings;
     }
 
     @Override
@@ -69,16 +70,18 @@ class RequireJsConfig extends Label implements IFeedback {
         try {
             JSONObject requireConfig = new JSONObject();
 
-            JSONObject shim = new JSONObject();
-            requireConfig.put(KEY_SHIM, shim);
+            requireConfig.put("baseUrl", getRequestCycle().getUrlRenderer().renderRelativeUrl(Url.parse("requirejs")) + "/");
 
-            addShim(shim);
+            JSONObject mappings = new JSONObject();
+            requireConfig.put("mappings", mappings);
 
-            JSONObject paths = new JSONObject();
-            requireConfig.put(KEY_PATHS, paths);
+            for (Map.Entry<String, String> mapping : getMappings().entrySet()) {
+                mappings.put(mapping.getKey(), mapping.getValue());
+            }
 
-            addJsLibraryPaths(paths);
-            addPaths(paths, getPaths());
+            requireConfig.put(KEY_SHIM, configureShims());
+
+            registerJsLibraries();
 
             content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("require.config(");
             if (getApplication().usesDevelopmentConfig()) {
@@ -94,7 +97,17 @@ class RequireJsConfig extends Label implements IFeedback {
         replaceComponentTagBody(markupStream, openTag, content);
     }
 
-    protected void addShim(JSONObject shim) throws JSONException {
+    /**
+     * Adds 'shim' to require.js config that loads 'Wicket' as a global variable
+     * and configures a dependency to 'wicket-event'.
+     *
+     * This is needed because wicket-***.js files are not AMD modules.
+     *
+     * @throws JSONException
+     */
+    protected JSONObject configureShims() throws JSONException {
+        JSONObject shim = new JSONObject();
+
         JSONObject shimWicketEvent = new JSONObject();
         shim.put(ID_WICKET_EVENT, shimWicketEvent);
         shimWicketEvent.put(KEY_DEPS, new JSONArray("[" + ID_JQUERY + "]"));
@@ -104,20 +117,20 @@ class RequireJsConfig extends Label implements IFeedback {
         shim.put(ID_WICKET, shimWicket);
         shimWicket.put(KEY_DEPS, new JSONArray("[" + ID_WICKET_EVENT + "]"));
         shimWicket.put(KEY_EXPORTS, ID_WICKET);
+
+        return shim;
     }
 
-    protected void addPaths(JSONObject paths, Map<String, String> pathElements) throws JSONException {
-        for (Map.Entry<String, String> p : pathElements.entrySet()) {
-            paths.put(p.getKey(), p.getValue());
-        }
-    }
-
-    protected void addJsLibraryPaths(JSONObject paths) throws JSONException {
+    /**
+     * Registers JQuery, WicketAjax and WicketEvent in the AMD module registry
+     */
+    protected void registerJsLibraries() {
         IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
-
-        paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
-        paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
-        paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
+        IRequireJsSettings settings = RequireJs.settings();
+        AmdModulesRegistry modulesRegistry = settings.getModulesRegistry();
+        modulesRegistry.register(ID_JQUERY, (JavaScriptResourceReference) javaScriptLibrarySettings.getJQueryReference());
+        modulesRegistry.register(ID_WICKET_EVENT, (JavaScriptResourceReference) javaScriptLibrarySettings.getWicketEventReference());
+        modulesRegistry.register(ID_WICKET, (JavaScriptResourceReference) javaScriptLibrarySettings.getWicketAjaxReference());
     }
 
 }

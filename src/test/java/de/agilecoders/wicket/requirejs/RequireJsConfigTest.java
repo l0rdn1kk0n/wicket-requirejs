@@ -16,16 +16,11 @@ import java.util.regex.Pattern;
 public class RequireJsConfigTest extends WicketApplicationTest {
 
     @Test
-    @Ignore
     public void correctMapIsRendered() throws Exception {
         tester().startComponentInPage(new RequireJsConfig("id"));
 
         tester().assertContains(Pattern.quote("require.config({\n"
-                                              + "  \"paths\": {\n"
-                                              + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
-                                              + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
-                                              + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery.js\"\n"
-                                              + "  },\n"
+                                              + "  \"baseUrl\": \"../requirejs/\",\n"
                                               + "  \"shim\": {\n"
                                               + "    \"wicket-event\": {\n"
                                               + "      \"exports\": \"wicket-event\",\n"
@@ -35,7 +30,8 @@ public class RequireJsConfigTest extends WicketApplicationTest {
                                               + "      \"exports\": \"Wicket\",\n"
                                               + "      \"deps\": [\"wicket-event\"]\n"
                                               + "    }\n"
-                                              + "  }\n"
+                                              + "  },\n"
+                                              + "  \"mappings\": {}\n"
                                               + "});"));
     }
 
@@ -50,6 +46,6 @@ public class RequireJsConfigTest extends WicketApplicationTest {
             }
         });
 
-        tester().assertContains(Pattern.quote("\"test\": \"./resource/de.agilecoders.wicket.requirejs.RequireJsConfig/test.js\""));
+        tester().assertContainsNot(Pattern.quote("\"test\": \"./resource/de.agilecoders.wicket.requirejs.RequireJsConfig/test.js\""));
     }
 }

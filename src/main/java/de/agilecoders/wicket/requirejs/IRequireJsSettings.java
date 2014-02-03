@@ -14,4 +14,7 @@ public interface IRequireJsSettings {
      */
     ResourceReference getResourceReference();
 
+    IRequireJsSettings setResourceReference(ResourceReference reference);
+
+    AmdModulesRegistry getModulesRegistry();
 }

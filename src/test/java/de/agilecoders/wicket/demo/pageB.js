@@ -1,6 +1,6 @@
-define("pageB", ["jquery", "Wicket"], function($, w) {
+define("pageB", ["wicket!jquery", "wicket!Wicket"], function($, w) {
 	return {
-		demo: function() {
+		b: function() {
 			"use strict";
 
 			$(".text").html("<strong>Welcome to Page B</strong>");

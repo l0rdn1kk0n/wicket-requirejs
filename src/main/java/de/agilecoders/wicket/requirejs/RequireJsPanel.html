@@ -4,6 +4,20 @@
     <wicket:panel>
         <script type="text/javascript" wicket:id="require.js"></script>
         <div wicket:id="config"></div>
+        <script type="text/javascript">
+        define("wicket", function() {
+            return {
+                load: function(name, req, onload, config) {
+
+                    name = config.mappings[name] || name;
+
+                    req([name], function(value) {
+                        onload(value);
+                    });
+                }
+            };
+        });
+        </script>
     </wicket:panel>
 </body>
 </html>

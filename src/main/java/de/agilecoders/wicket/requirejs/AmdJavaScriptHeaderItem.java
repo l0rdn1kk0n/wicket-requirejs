@@ -1,21 +1,12 @@
 package de.agilecoders.wicket.requirejs;
 
-import org.apache.wicket.Application;
-import org.apache.wicket.ResourceBundles;
+import java.util.Collections;
+
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IReferenceHeaderItem;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
-import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Response;
-import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.handler.resource.ResourceReferenceRequestHandler;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Args;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * A {@link HeaderItem} for AMD references that are used by require.js.
@@ -73,32 +64,9 @@ public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHea
 
     @Override
     public void render(Response response) {
-        Map<String,String> paths = RequireJsConfig.getPaths();
-        paths.put(getName(), getUrl());
-    }
-
-    /**
-     * @return the url to this {@link HeaderItem}
-     */
-    public String getUrl() {
-        IRequestHandler handler = null;
-
-        if (Application.exists()) {
-            ResourceBundles resourceBundles = Application.get().getResourceBundles();
-            HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(getReference(), getName()));
-
-            if (bundleItem instanceof JavaScriptReferenceHeaderItem) {
-                JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
-                ResourceReference bundleReference = jsBundleItem.getReference();
-                handler = new ResourceReferenceRequestHandler(bundleReference, null);
-            }
-        }
-
-        if (handler == null) {
-            handler = new ResourceReferenceRequestHandler(getReference(), null);
-        }
-
-        return RequestCycle.get().urlFor(handler).toString();
+        IRequireJsSettings settings = RequireJs.settings();
+        AmdModulesRegistry modulesRegistry = settings.getModulesRegistry();
+        modulesRegistry.register(getName(), getReference());
     }
 
     /**
@@ -109,7 +77,7 @@ public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHea
     }
 
     @Override
-    public ResourceReference getReference() {
+    public JavaScriptResourceReference getReference() {
         return reference;
     }
 }
