@@ -7,10 +7,8 @@
 
 Page c
 
-<div wicket:id="requireJs"></div>
-
 <script type="text/javascript">
-    require( ['pageC'], function(pageC) {
+    require( ['wicket!pageC'], function(pageC) {
         pageC.demo();
     });
 </script>

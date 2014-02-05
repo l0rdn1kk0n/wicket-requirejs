@@ -1,13 +1,10 @@
 package de.agilecoders.wicket.demo;
 
-import de.agilecoders.wicket.requirejs.IRequireJsSettings;
-import de.agilecoders.wicket.requirejs.RequireJs;
-import de.agilecoders.wicket.requirejs.RequireJsMapper;
-import de.agilecoders.wicket.requirejs.RequireJsSettings;
 import org.apache.wicket.Page;
-import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+
+import de.agilecoders.wicket.requirejs.RequireJs;
 
 /**
  *

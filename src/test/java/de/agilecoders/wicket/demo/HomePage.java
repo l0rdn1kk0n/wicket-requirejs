@@ -1,7 +1,8 @@
 package de.agilecoders.wicket.demo;
 
-import de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem;
-import de.agilecoders.wicket.requirejs.RequireJsPanel;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
@@ -9,8 +10,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem;
 
 /**
  *
@@ -22,8 +22,6 @@ public class HomePage extends WebPage
 		super(parameters);
 
 		add(new BookmarkablePageLink<Void>("pageB", PageB.class));
-
-		add(new RequireJsPanel("requireJs"));
 	}
 
 	@Override

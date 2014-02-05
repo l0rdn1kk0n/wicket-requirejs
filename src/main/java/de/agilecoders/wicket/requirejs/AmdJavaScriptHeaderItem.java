@@ -1,19 +1,23 @@
 package de.agilecoders.wicket.requirejs;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IReferenceHeaderItem;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.lang.Args;
 
 /**
- * A {@link HeaderItem} for AMD references that are used by require.js.
+ * A {@link HeaderItem} for AMD JavaScript resource references that are
+ * loaded asynchronously by require.js.
  *
  * @author martin-g
  */
-public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHeaderItem {
+public class AmdJavaScriptHeaderItem extends JavaScriptHeaderItem implements IReferenceHeaderItem {
 
     /**
      * Creates a {@link AmdJavaScriptHeaderItem} for the given reference.
@@ -53,6 +57,7 @@ public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHea
      * @param name      name that will be used as AMD identifier
      */
     public AmdJavaScriptHeaderItem(JavaScriptResourceReference reference, String name) {
+        super(null);
         this.reference = Args.notNull(reference, "reference");
         this.name = Args.notNull(name, "name");
     }
@@ -79,5 +84,12 @@ public class AmdJavaScriptHeaderItem extends HeaderItem implements IReferenceHea
     @Override
     public JavaScriptResourceReference getReference() {
         return reference;
+    }
+
+    @Override
+    public Iterable<? extends HeaderItem> getDependencies() {
+        List<HeaderItem> dependencies = new ArrayList<>();
+        dependencies.add(new RequireJsHeaderItem());
+        return dependencies;
     }
 }

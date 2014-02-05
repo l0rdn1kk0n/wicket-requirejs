@@ -17,22 +17,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * A registry that knows which JavaScriptResourceReference to load for an AMD module by name
  *
+ * Whenever {@link de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem} is used it registers
+ * its {@link org.apache.wicket.request.resource.JavaScriptResourceReference} in this registry.
+ * Later in JavaScript code the application should use <em>wicket</em> plugin
+ * (e.g. <em>wicket!my/fancy/module</em>) that will make a request to the mount path where
+ * {@link de.agilecoders.wicket.requirejs.RequireJsMapper} is listening and it will use this
+ * registry to return the JavaScript resource reference for the requested module
  */
 public class AmdModulesRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(AmdModulesRegistry.class);
 
-    private static final MetaDataKey<ConcurrentMap<String, JavaScriptResourceReference>> K =
+    private static final MetaDataKey<ConcurrentMap<String, JavaScriptResourceReference>> MAPPINGS =
             new MetaDataKey<ConcurrentMap<String, JavaScriptResourceReference>>() {
     };
 
     private ConcurrentMap<String, JavaScriptResourceReference> getMappings() {
         Application application = Application.get();
-        ConcurrentMap<String, JavaScriptResourceReference> mappings = application.getMetaData(K);
+        ConcurrentMap<String, JavaScriptResourceReference> mappings = application.getMetaData(MAPPINGS);
         if (mappings == null) {
             mappings = new ConcurrentHashMap<>();
-            application.setMetaData(K, mappings);
+            application.setMetaData(MAPPINGS, mappings);
         }
 
         return mappings;
@@ -43,14 +50,15 @@ public class AmdModulesRegistry {
     }
 
     /**
+     * Registers an AMD module in this registry
      *
-     * @param moduleName
-     * @param reference
+     * @param moduleName The name of the AMD module, e.g. 'my/module'
+     * @param reference  The JavaScriptResourceReference that loads the content of the module
      */
     public void register(String moduleName, JavaScriptResourceReference reference) {
         boolean registered = false;
 
-        Map<String, String> mappings = RequireJsConfig.getMappings();
+        Map<String, String> mappings = RequireJsConfigHeaderItem.getMappings();
 
         if (Application.exists()) {
             ResourceBundles resourceBundles = Application.get().getResourceBundles();

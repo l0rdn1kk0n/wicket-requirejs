@@ -9,23 +9,17 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONException;
 import org.apache.wicket.ajax.json.JSONObject;
-import org.apache.wicket.core.util.string.JavaScriptUtils;
-import org.apache.wicket.feedback.IFeedback;
-import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.MarkupStream;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.UrlRenderer;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
 
 /**
- * The {@link RequireJsConfig} renders the javascript configuration object that is used
- * by require.js to locate resources and to resolve their dependencies.
- *
- * @author martin-g
- * @author miha
+ * A header item that contributes the require.js configuration.
+ * It is contributed as dependency of {@link de.agilecoders.wicket.requirejs.RequireJsHeaderItem}
  */
-class RequireJsConfig extends Label implements IFeedback {
+class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
 
     /**
      * A key used to store the paths for all AMD modules in a request cycle
@@ -43,44 +37,26 @@ class RequireJsConfig extends Label implements IFeedback {
     private static final String ID_JQUERY = "jquery";
 
     /**
-     * Construct.
-     *
-     * @param id component id
+     * Creates a new {@code JavaScriptContentHeaderItem}.
      */
-    public RequireJsConfig(final String id) {
-        super(id);
-    }
-
-    /**
-     * @return a map that stores all amdModuleName -> amdModuleUrl per request cycle
-     */
-    public static Map<String, String> getMappings() {
-        Application application = Application.get();
-        Map<String, String> mappings = application.getMetaData(PATHS_KEY);
-        if (mappings == null) {
-            synchronized (RequireJsConfig.class) {
-                mappings = application.getMetaData(PATHS_KEY);
-                if (mappings == null) {
-                    mappings = new HashMap<>();
-                    application.setMetaData(PATHS_KEY, mappings);
-                }
-            }
-        }
-        return mappings;
+    public RequireJsConfigHeaderItem() {
+        super(null, "wicket-require.js-config", null);
     }
 
     @Override
-    public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag) {
+    public CharSequence getJavaScript() {
         final StringBuilder content = new StringBuilder();
-
+        Application application = Application.get();
+        RequestCycle cycle = RequestCycle.get();
+        
         try {
             JSONObject requireConfig = new JSONObject();
 
-            IRequireJsSettings requireJsSettings = RequireJs.settings(getApplication());
-            UrlRenderer urlRenderer = getRequestCycle().getUrlRenderer();
+            IRequireJsSettings requireJsSettings = RequireJs.settings(application);
+            UrlRenderer urlRenderer = cycle.getUrlRenderer();
 
             String mountPath = requireJsSettings.getMountPath();
-            String relativeMountPathUrl = urlRenderer.renderRelativeUrl(Url.parse(mountPath));
+            String relativeMountPathUrl = urlRenderer.renderContextRelativeUrl(mountPath);
             requireConfig.put("mountPath", relativeMountPathUrl);
 
             String baseUrl = urlRenderer.renderRelativeUrl(Url.parse("/"));
@@ -90,20 +66,35 @@ class RequireJsConfig extends Label implements IFeedback {
 
             configureShims(requireConfig);
 
-            configurePaths(requireConfig);
+            configurePaths(requireConfig, application, cycle);
 
-            content.append(JavaScriptUtils.SCRIPT_OPEN_TAG).append("require.config(");
-            if (getApplication().usesDevelopmentConfig()) {
+            content.append("require.config(");
+            if (application.usesDevelopmentConfig()) {
                 content.append(requireConfig.toString(2));
             } else {
                 content.append(requireConfig.toString());
             }
-            content.append(')').append(';').append(JavaScriptUtils.SCRIPT_CLOSE_TAG);
+            content.append(')').append(';');
         } catch (JSONException e) {
             throw new WicketRuntimeException(e);
         }
+        
+        return content;
+    }
 
-        replaceComponentTagBody(markupStream, openTag, content);
+    public static Map<String, String> getMappings() {
+        Application application = Application.get();
+        Map<String, String> mappings = application.getMetaData(PATHS_KEY);
+        if (mappings == null) {
+            synchronized (RequireJsConfigHeaderItem.class) {
+                mappings = application.getMetaData(PATHS_KEY);
+                if (mappings == null) {
+                    mappings = new HashMap<>();
+                    application.setMetaData(PATHS_KEY, mappings);
+                }
+            }
+        }
+        return mappings;
     }
 
     protected void configureMappings(JSONObject requireJsConfig) throws JSONException {
@@ -142,14 +133,14 @@ class RequireJsConfig extends Label implements IFeedback {
         requireJsConfig.put(KEY_SHIM, shim);
     }
 
-    protected void configurePaths(JSONObject requireJsConfig) throws JSONException {
+    protected void configurePaths(JSONObject requireJsConfig, Application application, RequestCycle cycle) throws JSONException {
         JSONObject paths = new JSONObject();
 
-        IJavaScriptLibrarySettings javaScriptLibrarySettings = getApplication().getJavaScriptLibrarySettings();
+        IJavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
 
-        paths.put(ID_JQUERY, urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
-        paths.put(ID_WICKET_EVENT, urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
-        paths.put(ID_WICKET, urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
+        paths.put(ID_JQUERY, cycle.urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
+        paths.put(ID_WICKET_EVENT, cycle.urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
+        paths.put(ID_WICKET, cycle.urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
 
         requireJsConfig.put(KEY_PATHS, paths);
     }

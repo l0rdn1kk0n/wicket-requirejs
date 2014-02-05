@@ -7,7 +7,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import de.agilecoders.wicket.webjars.WicketWebjars;
 
 /**
- * Bootstrap class that adds the {@link IRequireJsSettings} to an {@link Application} and
+ * Configuration class that adds the {@link IRequireJsSettings} to an {@link Application} and
  * provides access to them via a static getter method {@link #settings()}/{@link #settings(org.apache.wicket.Application)}.
  *
  * @author miha

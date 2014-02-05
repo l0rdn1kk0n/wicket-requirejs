@@ -1,18 +1,19 @@
 package de.agilecoders.wicket.demo;
 
-import de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem;
-import de.agilecoders.wicket.requirejs.RequireJsPanel;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+
+import de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem;
 
 /**
  *
  */
 public class PageB extends WebPage
 {
-	public PageB() {
-		add(new RequireJsPanel("requireJs"));
+	public PageB(PageParameters parameters) {
+        super(parameters);
 	}
 
 	@Override
