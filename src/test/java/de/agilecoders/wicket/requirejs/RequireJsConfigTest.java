@@ -1,12 +1,12 @@
 package de.agilecoders.wicket.requirejs;
 
-import de.agilecoders.wicket.WicketApplicationTest;
+import java.util.regex.Pattern;
+
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.regex.Pattern;
+import de.agilecoders.wicket.WicketApplicationTest;
 
 /**
  * Tests the {@link RequireJsConfig} component
