@@ -10,7 +10,7 @@ import org.apache.wicket.markup.head.NoHeaderItem;
 /**
  * The header item that contributes require.js, the config and the special
  * plugin that loads AMD modules contributed with
- * {@link de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem}
+ * {@link AmdModuleHeaderItem}
  */
 public class RequireJsHeaderItem extends NoHeaderItem {
 

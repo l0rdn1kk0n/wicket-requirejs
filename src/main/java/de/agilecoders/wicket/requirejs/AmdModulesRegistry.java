@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * A registry that knows which JavaScriptResourceReference to load for an AMD module by name
  *
- * Whenever {@link de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem} is used it registers
+ * Whenever {@link AmdModuleHeaderItem} is used it registers
  * its {@link org.apache.wicket.request.resource.JavaScriptResourceReference} in this registry.
  * Later in JavaScript code the application should use <em>wicket</em> plugin
  * (e.g. <em>wicket!my/fancy/module</em>) that will make a request to the mount path where

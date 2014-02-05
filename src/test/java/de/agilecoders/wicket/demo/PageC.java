@@ -5,7 +5,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 
-import de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem;
+import de.agilecoders.wicket.requirejs.AmdModuleHeaderItem;
 
 /**
  *
@@ -21,6 +21,6 @@ public class PageC extends WebPage
 	{
 		super.renderHead(response);
 
-		response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(PageC.class, "pageC.js"), "pageC"));
+		response.render(AmdModuleHeaderItem.forReference(new JavaScriptResourceReference(PageC.class, "pageC.js"), "pageC"));
 	}
 }

@@ -53,7 +53,7 @@ public class RequireJsConfigHeaderItemTest extends WicketApplicationTest {
             public void renderHead(IHeaderResponse response) {
                 super.renderHead(response);
 
-                response.render(AmdJavaScriptHeaderItem.forReference(new JavaScriptResourceReference(RequireJsConfigHeaderItemTest.class, "test.js"), "test"));
+                response.render(AmdModuleHeaderItem.forReference(new JavaScriptResourceReference(RequireJsConfigHeaderItemTest.class, "test.js"), "test"));
             }
         });
 

@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletResponse;
  * to find the {@link org.apache.wicket.request.resource.JavaScriptResourceReference}
  * for each module.
  *
- * The modules are registered by {@link de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem}
+ * The modules are registered by {@link AmdModuleHeaderItem}
  *
- * @see de.agilecoders.wicket.requirejs.AmdJavaScriptHeaderItem
+ * @see AmdModuleHeaderItem
  */
 public class RequireJsMapper extends MountMapper {
 

@@ -17,27 +17,27 @@ import org.apache.wicket.util.lang.Args;
  *
  * @author martin-g
  */
-public class AmdJavaScriptHeaderItem extends JavaScriptHeaderItem implements IReferenceHeaderItem {
+public class AmdModuleHeaderItem extends JavaScriptHeaderItem implements IReferenceHeaderItem {
 
     /**
-     * Creates a {@link AmdJavaScriptHeaderItem} for the given reference.
+     * Creates a {@link AmdModuleHeaderItem} for the given reference.
      *
      * @param reference resource reference pointing to the javascript resource
-     * @return A newly created {@link AmdJavaScriptHeaderItem} for the given reference.
+     * @return A newly created {@link AmdModuleHeaderItem} for the given reference.
      */
-    public static AmdJavaScriptHeaderItem forReference(JavaScriptResourceReference reference) {
+    public static AmdModuleHeaderItem forReference(JavaScriptResourceReference reference) {
         return forReference(reference, reference.getName());
     }
 
     /**
-     * Creates a {@link AmdJavaScriptHeaderItem} for the given reference.
+     * Creates a {@link AmdModuleHeaderItem} for the given reference.
      *
      * @param reference resource reference pointing to the javascript resource
      * @param name      id that will be used as AMD identifier
-     * @return A newly created {@link AmdJavaScriptHeaderItem} for the given reference.
+     * @return A newly created {@link AmdModuleHeaderItem} for the given reference.
      */
-    public static AmdJavaScriptHeaderItem forReference(JavaScriptResourceReference reference, String name) {
-        return new AmdJavaScriptHeaderItem(reference, name);
+    public static AmdModuleHeaderItem forReference(JavaScriptResourceReference reference, String name) {
+        return new AmdModuleHeaderItem(reference, name);
     }
 
     /**
@@ -51,12 +51,12 @@ public class AmdJavaScriptHeaderItem extends JavaScriptHeaderItem implements IRe
     private final JavaScriptResourceReference reference;
 
     /**
-     * Creates a new {@code AmdJavaScriptHeaderItem}.
+     * Creates a new {@code AmdModuleHeaderItem}.
      *
      * @param reference resource reference pointing to the javascript resource
      * @param name      name that will be used as AMD identifier
      */
-    public AmdJavaScriptHeaderItem(JavaScriptResourceReference reference, String name) {
+    public AmdModuleHeaderItem(JavaScriptResourceReference reference, String name) {
         super(null);
         this.reference = Args.notNull(reference, "reference");
         this.name = Args.notNull(name, "name");
