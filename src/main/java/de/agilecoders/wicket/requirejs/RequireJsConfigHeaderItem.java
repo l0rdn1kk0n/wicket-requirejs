@@ -84,7 +84,9 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
 
     private void configureWaitSeconds(JSONObject requireConfig, Application application) throws JSONException {
         if (application.usesDevelopmentConfig()) {
-            requireConfig.put(KEY_WAIT_SECONDS, 600); // 10 minutes
+            IRequireJsSettings settings = RequireJs.settings(application);
+            int waitSeconds = settings.getWaitSeconds();
+            requireConfig.put(KEY_WAIT_SECONDS, waitSeconds);
         }
     }
 

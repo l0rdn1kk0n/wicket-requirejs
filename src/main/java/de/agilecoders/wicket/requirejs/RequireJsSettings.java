@@ -20,6 +20,8 @@ public class RequireJsSettings implements IRequireJsSettings {
 
     private String mountPath = "wicket/requirejs";
 
+    private int waitSeconds = 600; // 10 minutes
+
     @Override
     public ResourceReference getResourceReference() {
         return requireJsReference;
@@ -48,6 +50,17 @@ public class RequireJsSettings implements IRequireJsSettings {
     @Override
     public String getMountPath() {
         return mountPath;
+    }
+
+    @Override
+    public int getWaitSeconds() {
+        return waitSeconds;
+    }
+
+    @Override
+    public IRequireJsSettings setWaitSeconds(int waitSeconds) {
+        this.waitSeconds = waitSeconds;
+        return this;
     }
 
 }

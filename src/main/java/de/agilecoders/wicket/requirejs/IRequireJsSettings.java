@@ -30,4 +30,15 @@ public interface IRequireJsSettings {
      *                  should use.
      */
     String getMountPath();
+
+    /**
+     * @return The number of seconds Require.js should wait for loading a module.
+     */
+    int getWaitSeconds();
+
+    /**
+     * @param waitSeconds The number of seconds Require.js should wait for loading a module.
+     * @return {@code this} instance, for chaining
+     */
+    IRequireJsSettings setWaitSeconds(int waitSeconds);
 }
