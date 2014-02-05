@@ -31,6 +31,7 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
     private static final String KEY_DEPS = "deps";
     private static final String KEY_EXPORTS = "exports";
     private static final String KEY_PATHS = "paths";
+    private static final String KEY_WAIT_SECONDS = "waitSeconds";
 
     private static final String ID_WICKET = "Wicket";
     private static final String ID_WICKET_EVENT = "wicket-event";
@@ -52,15 +53,14 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
         try {
             JSONObject requireConfig = new JSONObject();
 
-            IRequireJsSettings requireJsSettings = RequireJs.settings(application);
             UrlRenderer urlRenderer = cycle.getUrlRenderer();
 
-            String mountPath = requireJsSettings.getMountPath();
-            String relativeMountPathUrl = urlRenderer.renderContextRelativeUrl(mountPath);
-            requireConfig.put("mountPath", relativeMountPathUrl);
+            configureMountPath(requireConfig, application, urlRenderer);
 
             String baseUrl = urlRenderer.renderRelativeUrl(Url.parse("/"));
             requireConfig.put("baseUrl", baseUrl);
+
+            configureWaitSeconds(requireConfig, application);
 
             configureMappings(requireConfig);
 
@@ -82,6 +82,20 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
         return content;
     }
 
+    private void configureWaitSeconds(JSONObject requireConfig, Application application) throws JSONException {
+        if (application.usesDevelopmentConfig()) {
+            requireConfig.put(KEY_WAIT_SECONDS, 600); // 10 minutes
+        }
+    }
+
+    private void configureMountPath(JSONObject requireConfig, Application application, UrlRenderer urlRenderer)
+            throws JSONException {
+        IRequireJsSettings requireJsSettings = RequireJs.settings(application);
+        String mountPath = requireJsSettings.getMountPath();
+        String relativeMountPathUrl = urlRenderer.renderContextRelativeUrl(mountPath);
+        requireConfig.put("mountPath", relativeMountPathUrl);
+    }
+
     public static Map<String, String> getMappings() {
         Application application = Application.get();
         Map<String, String> mappings = application.getMetaData(PATHS_KEY);
@@ -97,7 +111,7 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
         return mappings;
     }
 
-    protected void configureMappings(JSONObject requireJsConfig) throws JSONException {
+    private void configureMappings(JSONObject requireJsConfig) throws JSONException {
         Map<String, String> mappings = getMappings();
         if (!mappings.isEmpty()) {
             JSONObject mappingsJson = new JSONObject();
@@ -117,7 +131,7 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
      *
      * @throws JSONException
      */
-    protected void configureShims(JSONObject requireJsConfig) throws JSONException {
+    private void configureShims(JSONObject requireJsConfig) throws JSONException {
         JSONObject shim = new JSONObject();
 
         JSONObject shimWicketEvent = new JSONObject();
@@ -133,7 +147,8 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
         requireJsConfig.put(KEY_SHIM, shim);
     }
 
-    protected void configurePaths(JSONObject requireJsConfig, Application application, RequestCycle cycle) throws JSONException {
+    private void configurePaths(JSONObject requireJsConfig, Application application, RequestCycle cycle)
+            throws JSONException {
         JSONObject paths = new JSONObject();
 
         IJavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
