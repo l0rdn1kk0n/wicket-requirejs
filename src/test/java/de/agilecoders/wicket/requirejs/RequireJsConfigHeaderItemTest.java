@@ -1,7 +1,6 @@
 package de.agilecoders.wicket.requirejs;
 
-import java.util.regex.Pattern;
-
+import de.agilecoders.wicket.WicketApplicationTest;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.IMarkupResourceStreamProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -12,7 +11,7 @@ import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.junit.Test;
 
-import de.agilecoders.wicket.WicketApplicationTest;
+import java.util.regex.Pattern;
 
 /**
  * Tests the {@link RequireJsConfigHeaderItem} component
@@ -26,7 +25,7 @@ public class RequireJsConfigHeaderItemTest extends WicketApplicationTest {
         tester().startPage(new TestPage());
 
         tester().assertContains(Pattern.quote("require.config({\n"
-                                              + "  \"baseUrl\": \"..//\",\n"
+                                              + "  \"baseUrl\": \"../\",\n"
                                               + "  \"paths\": {\n"
                                               + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
                                               + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
@@ -42,6 +41,7 @@ public class RequireJsConfigHeaderItemTest extends WicketApplicationTest {
                                               + "      \"deps\": [\"wicket-event\"]\n"
                                               + "    }\n"
                                               + "  },\n"
+                                              + "  \"waitSeconds\": 600,\n"
                                               + "  \"mountPath\": \"../wicket/requirejs\"\n"
                                               + "});"));
     }

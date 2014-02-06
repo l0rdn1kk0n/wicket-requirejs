@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * TODO miha: document class purpose
+ * base test case class
  *
  * @author miha
  */
@@ -33,9 +33,7 @@ public abstract class WicketApplicationTest {
     }
 
     /**
-     * TODO
-     *
-     * @return TODO
+     * @return creates a new web application
      */
     protected WebApplication newWebApplication() {
         return new MockApplication() {
@@ -46,7 +44,6 @@ public abstract class WicketApplicationTest {
                     RequireJs.install(this, new RequireJsSettings());
 
                     getResourceSettings().getResourceFinders().add(new ClassPathResourceFinder(""));
-//                    getResourceBundles().addJavaScriptBundle(WicketApplicationTest.class, "main.js", new BootstrapJavaScriptResourceReference());
                 }
             }
         };

@@ -14,16 +14,10 @@ public interface IRequireJsSettings {
      */
     ResourceReference getResourceReference();
 
-    IRequireJsSettings setResourceReference(ResourceReference reference);
-
-    AmdModulesRegistry getModulesRegistry();
-
     /**
-     * @param mountPath The mount path that {@link de.agilecoders.wicket.requirejs.RequireJsMapper}
-     *                  should use.
-     * @return {@code this} instance, for chaining
+     * @return amd module registry
      */
-    IRequireJsSettings setMountPath(String mountPath);
+    AmdModulesRegistry getModulesRegistry();
 
     /**
      * @return The mount path that {@link de.agilecoders.wicket.requirejs.RequireJsMapper}
@@ -34,11 +28,6 @@ public interface IRequireJsSettings {
     /**
      * @return The number of seconds Require.js should wait for loading a module.
      */
-    int getWaitSeconds();
+    long getWaitSeconds();
 
-    /**
-     * @param waitSeconds The number of seconds Require.js should wait for loading a module.
-     * @return {@code this} instance, for chaining
-     */
-    IRequireJsSettings setWaitSeconds(int waitSeconds);
 }

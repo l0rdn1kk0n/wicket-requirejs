@@ -1,10 +1,9 @@
 package de.agilecoders.wicket.requirejs;
 
+import de.agilecoders.wicket.webjars.WicketWebjars;
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.protocol.http.WebApplication;
-
-import de.agilecoders.wicket.webjars.WicketWebjars;
 
 /**
  * Configuration class that adds the {@link IRequireJsSettings} to an {@link Application} and
@@ -36,11 +35,12 @@ public final class RequireJs {
      * @param settings    the configuration settings for RequireJs
      */
     public static void install(final WebApplication application, final IRequireJsSettings settings) {
-        application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
+        if (application.getMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY) == null) {
+            WicketWebjars.install(application);
 
-        application.mount(new RequireJsMapper(settings));
-
-        WicketWebjars.install(application);
+            application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
+            application.mount(new RequireJsMapper(settings));
+        }
     }
 
     /**

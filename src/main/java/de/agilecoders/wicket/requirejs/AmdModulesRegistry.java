@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * registry to return the JavaScript resource reference for the requested module
  */
 public class AmdModulesRegistry {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AmdModulesRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RequireJs.class);
 
     private static final MetaDataKey<ConcurrentMap<String, JavaScriptResourceReference>> MAPPINGS =
             new MetaDataKey<ConcurrentMap<String, JavaScriptResourceReference>>() {
@@ -45,6 +44,12 @@ public class AmdModulesRegistry {
         return mappings;
     }
 
+    /**
+     * returns resource reference according to given module name
+     *
+     * @param moduleName the module name
+     * @return resource reference that belongs to module name
+     */
     public ResourceReference getReference(String moduleName) {
         return getMappings().get(name(moduleName));
     }
@@ -58,8 +63,6 @@ public class AmdModulesRegistry {
     public void register(String moduleName, JavaScriptResourceReference reference) {
         boolean registered = false;
 
-        Map<String, String> mappings = RequireJsConfigHeaderItem.getMappings();
-
         if (Application.exists()) {
             ResourceBundles resourceBundles = Application.get().getResourceBundles();
             HeaderItem bundleItem = resourceBundles.findBundle(JavaScriptHeaderItem.forReference(reference, moduleName));
@@ -68,7 +71,10 @@ public class AmdModulesRegistry {
                 JavaScriptReferenceHeaderItem jsBundleItem = (JavaScriptReferenceHeaderItem) bundleItem;
                 JavaScriptResourceReference bundleReference = (JavaScriptResourceReference) jsBundleItem.getReference();
                 put(moduleName, bundleReference);
+
+                Map<String, String> mappings = RequireJsConfigHeaderItem.getMappings();
                 mappings.put(moduleName, bundleReference.getName());
+
                 registered = true;
             }
         }
@@ -78,19 +84,34 @@ public class AmdModulesRegistry {
         }
     }
 
+    /**
+     * adds a new module resource reference
+     *
+     * @param moduleName the module name
+     * @param reference the resource reference for module
+     */
     private void put(String moduleName, JavaScriptResourceReference reference) {
         ResourceReference old = getMappings().putIfAbsent(name(moduleName), reference);
+
         if (old != null && !old.equals(reference)) {
             LOG.error("'{}' hasn't been registered as AMD module '{}' because there is another module with this name already: {}",
                       reference, moduleName, old);
         }
     }
 
+    /**
+     * assert that given name isn't empty and appends ".js" if missing
+     *
+     * @param moduleName the module name to clean up
+     * @return cleaned module name
+     */
     private String name(String moduleName) {
-        Args.notNull(moduleName, "moduleName");
+        Args.notEmpty(moduleName, "moduleName");
+
         if (!moduleName.endsWith(".js")) {
             moduleName += ".js";
         }
+
         return moduleName;
     }
 }

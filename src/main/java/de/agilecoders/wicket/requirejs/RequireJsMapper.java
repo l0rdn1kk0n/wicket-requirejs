@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * RequireJsMapper will use the {@link IRequireJsSettings#getModulesRegistry() registry}
  * to find the {@link org.apache.wicket.request.resource.JavaScriptResourceReference}
  * for each module.
- *
+ * <p/>
  * The modules are registered by {@link AmdModuleHeaderItem}
  *
  * @see AmdModuleHeaderItem
@@ -50,7 +50,6 @@ public class RequireJsMapper extends MountMapper {
                 Url resourceUrl = new Url(url);
                 resourceUrl.removeLeadingSegments(mountPathSegmentsNumber);
 
-
                 String moduleName = resourceUrl.toString();
 
                 AmdModulesRegistry modulesRegistry = settings.getModulesRegistry();
@@ -58,12 +57,13 @@ public class RequireJsMapper extends MountMapper {
 
                 if (reference != null) {
                     IResource resource = reference.getResource();
-                    IResource.Attributes attributes = new IResource.Attributes(requestCycle.getRequest(), requestCycle.getResponse());
+                    IResource.Attributes attributes = new IResource.Attributes(requestCycle.getRequest(),
+                                                                               requestCycle.getResponse());
                     resource.respond(attributes);
-                }
-                else {
+                } else {
                     WebResponse response = (WebResponse) requestCycle.getResponse();
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("RequireJs module with name '%s' cannot be found", moduleName));
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                                       String.format("RequireJs module with name '%s' cannot be found", moduleName));
                 }
             }
         }

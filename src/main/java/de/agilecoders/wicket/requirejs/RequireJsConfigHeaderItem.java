@@ -1,8 +1,5 @@
 package de.agilecoders.wicket.requirejs;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.WicketRuntimeException;
@@ -14,6 +11,9 @@ import org.apache.wicket.request.Url;
 import org.apache.wicket.request.UrlRenderer;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IJavaScriptLibrarySettings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A header item that contributes the require.js configuration.
@@ -58,7 +58,7 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
             configureMountPath(requireConfig, application, urlRenderer);
 
             String baseUrl = urlRenderer.renderRelativeUrl(Url.parse("/"));
-            requireConfig.put("baseUrl", baseUrl);
+            requireConfig.put("baseUrl", baseUrl.replaceAll("//", "/"));
 
             configureWaitSeconds(requireConfig, application);
 
@@ -85,7 +85,7 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
     private void configureWaitSeconds(JSONObject requireConfig, Application application) throws JSONException {
         if (application.usesDevelopmentConfig()) {
             IRequireJsSettings settings = RequireJs.settings(application);
-            int waitSeconds = settings.getWaitSeconds();
+            long waitSeconds = settings.getWaitSeconds();
             requireConfig.put(KEY_WAIT_SECONDS, waitSeconds);
         }
     }
