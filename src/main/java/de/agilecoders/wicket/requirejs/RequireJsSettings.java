@@ -12,26 +12,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class RequireJsSettings implements IRequireJsSettings {
 
-    private static final class Holder {
-        private static final ResourceReference DEFAULT_REFERENCE = new WebjarsJavaScriptResourceReference("requirejs/current/require.js");
-    }
-
     private final AmdModulesRegistry registry;
     private final String mountPath;
     private final long waitSeconds;
+    private final ResourceReference resourceReference;
 
     /**
      * Construct.
      */
     public RequireJsSettings() {
+
+
         this.registry = new AmdModulesRegistry();
         this.mountPath = "wicket/requirejs";
         this.waitSeconds = TimeUnit.MINUTES.toSeconds(10);
+        this.resourceReference = new WebjarsJavaScriptResourceReference("requirejs/current/require.js");
     }
 
     @Override
     public ResourceReference getResourceReference() {
-        return Holder.DEFAULT_REFERENCE;
+        return resourceReference;
     }
 
     @Override

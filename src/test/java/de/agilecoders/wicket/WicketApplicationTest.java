@@ -1,7 +1,6 @@
 package de.agilecoders.wicket;
 
 import de.agilecoders.wicket.requirejs.RequireJs;
-import de.agilecoders.wicket.requirejs.RequireJsSettings;
 import org.apache.wicket.core.util.resource.ClassPathResourceFinder;
 import org.apache.wicket.mock.MockApplication;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -41,7 +40,7 @@ public abstract class WicketApplicationTest {
             @Override
             protected void init() {
                 if (WicketApplicationTest.this.initApplication(this)) {
-                    RequireJs.install(this, new RequireJsSettings());
+                    RequireJs.install(this);
 
                     getResourceSettings().getResourceFinders().add(new ClassPathResourceFinder(""));
                 }
