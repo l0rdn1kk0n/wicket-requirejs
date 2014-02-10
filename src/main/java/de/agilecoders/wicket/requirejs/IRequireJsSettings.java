@@ -20,7 +20,7 @@ public interface IRequireJsSettings {
     AmdModulesRegistry getModulesRegistry();
 
     /**
-     * @return The mount path that {@link de.agilecoders.wicket.requirejs.RequireJsMapper}
+     * @return The mount path that {@link de.agilecoders.wicket.requirejs.WicketRequireJSLoader}
      *                  should use.
      */
     String getMountPath();
