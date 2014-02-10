@@ -23,8 +23,10 @@ import java.util.concurrent.ConcurrentMap;
  * its {@link org.apache.wicket.request.resource.JavaScriptResourceReference} in this registry.
  * Later in JavaScript code the application should use <em>wicket</em> plugin
  * (e.g. <em>wicket!my/fancy/module</em>) that will make a request to the mount path where
- * {@link de.agilecoders.wicket.requirejs.RequireJsMapper} is listening and it will use this
- * registry to return the JavaScript resource reference for the requested module
+ * {@link de.agilecoders.wicket.requirejs.WicketRequireJSLoader} is listening and it will use this
+ * registry to return the JavaScript resource reference for the requested module.
+ *
+ * @see de.agilecoders.wicket.requirejs.WicketRequireJSLoader
  */
 public class AmdModulesRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(RequireJs.class);

@@ -43,7 +43,7 @@ public final class RequireJs {
             }
 
             application.setMetaData(REQUIRE_JS_SETTINGS_META_DATA_KEY, settings);
-            application.mount(new RequireJsMapper(settings));
+            application.mountResource(settings.getMountPath(), new WicketRequireJSLoader(settings));
         }
     }
 

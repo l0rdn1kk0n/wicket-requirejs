@@ -6,6 +6,7 @@ import org.apache.wicket.mock.MockApplication;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 /**
@@ -13,7 +14,7 @@ import org.junit.Before;
  *
  * @author miha
  */
-public abstract class WicketApplicationTest {
+public abstract class WicketApplicationTest extends Assert {
 
     private WicketTester tester;
 
