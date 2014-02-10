@@ -10,6 +10,9 @@ import org.junit.Test;
  */
 public class WicketRequireJSLoaderTest extends WicketApplicationTest {
 
+    /**
+     * Loads an existing and registered AMD module
+     */
     @Test
     public void ok() {
 
@@ -28,6 +31,9 @@ public class WicketRequireJSLoaderTest extends WicketApplicationTest {
         tester().assertContains("var a = 'a';");
     }
 
+    /**
+     * A request to non-existing AMD module
+     */
     @Test
     public void notFound() {
 
@@ -45,7 +51,9 @@ public class WicketRequireJSLoaderTest extends WicketApplicationTest {
         assertEquals(404, tester().getLastResponse().getStatus());
     }
 
-
+    /**
+     * A request to the special resource reference but without moduleName in the indexed parameters
+     */
     @Test
     public void badRequest() {
 
