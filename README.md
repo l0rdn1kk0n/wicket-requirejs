@@ -8,9 +8,9 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 Dependencies
 ------------
 
-* Apache Wicket 6.13.0
-* wicket-webjars 0.3.4
-* require.js 2.1.10
+* Apache Wicket 6.19.0
+* wicket-webjars 0.4.5
+* require.js 2.1.17
 
 Usage
 -----
@@ -22,7 +22,7 @@ add the following maven dependency to your pom:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;de.agilecoders.wicket.requirejs&lt;/groupId&gt;
   &lt;artifactId&gt;wicket-requirejs&lt;/artifactId&gt;
-  &lt;version&gt;0.1.1&lt;/version&gt;
+  &lt;version&gt;0.1.2&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
