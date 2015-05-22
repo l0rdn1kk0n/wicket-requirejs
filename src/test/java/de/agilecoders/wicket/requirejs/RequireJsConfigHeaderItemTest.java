@@ -24,12 +24,14 @@ public class RequireJsConfigHeaderItemTest extends WicketApplicationTest {
     public void correctMapIsRendered() throws Exception {
         tester().startPage(new TestPage());
 
+        String lastResponseAsString = tester().getLastResponseAsString();
+
         tester().assertContains(Pattern.quote("require.config({\n"
                                               + "  \"baseUrl\": \"../\",\n"
                                               + "  \"paths\": {\n"
                                               + "    \"wicket-event\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-event-jquery.js\",\n"
                                               + "    \"Wicket\": \"./resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/res/js/wicket-ajax-jquery.js\",\n"
-                                              + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-1.10.2.js\"\n"
+                                              + "    \"jquery\": \"./resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-1.11.2.js\"\n"
                                               + "  },\n"
                                               + "  \"shim\": {\n"
                                               + "    \"wicket-event\": {\n"
