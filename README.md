@@ -20,9 +20,9 @@ You can find a simple demo application in test package: `de.agilecoders.wicket.d
 Maven: wicket-requirejs is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-requirejs|0.1.0|jar) in Maven central repository.
 add the following maven dependency to your pom:
 <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;de.agilecoders.wicket&lt;/groupId&gt;
+  &lt;groupId&gt;de.agilecoders.wicket.requirejs&lt;/groupId&gt;
   &lt;artifactId&gt;wicket-requirejs&lt;/artifactId&gt;
-  &lt;version&gt;0.1.0&lt;/version&gt;
+  &lt;version&gt;0.1.1&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
