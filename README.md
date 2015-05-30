@@ -31,10 +31,11 @@ First, you have to install an `IRequireJsSettings` implementation to your applic
 ```java
 @Override
 protected void init() {
+    
     RequireJs.install(this); // use this if you want to use default settings.
 
     // or
-
+    // WicketWebjars.install(this); // uncomment this line if MyRequireJsSettings is going to use webjars
     RequireJs.install(this, new MyRequireJsSettings()); // if you want to use your own configuration
 }
 ```
