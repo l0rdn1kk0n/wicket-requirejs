@@ -10,7 +10,7 @@ import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.UrlRenderer;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.settings.IJavaScriptLibrarySettings;
+import org.apache.wicket.settings.JavaScriptLibrarySettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,10 +92,9 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
 
     private void configureMountPath(JSONObject requireConfig, Application application, UrlRenderer urlRenderer)
             throws JSONException {
-        IRequireJsSettings requireJsSettings = RequireJs.settings(application);
+    	IRequireJsSettings requireJsSettings = RequireJs.settings(application);
         String mountPath = requireJsSettings.getMountPath();
-        String relativeMountPathUrl = urlRenderer.renderContextRelativeUrl(mountPath);
-        requireConfig.put("mountPath", relativeMountPathUrl);
+        requireConfig.put("mountPath", mountPath);
     }
 
     public static Map<String, String> getMappings() {
@@ -153,12 +152,13 @@ class RequireJsConfigHeaderItem extends JavaScriptContentHeaderItem {
             throws JSONException {
         JSONObject paths = new JSONObject();
 
-        IJavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
-
-        paths.put(ID_JQUERY, cycle.urlFor(javaScriptLibrarySettings.getJQueryReference(), null));
-        paths.put(ID_WICKET_EVENT, cycle.urlFor(javaScriptLibrarySettings.getWicketEventReference(), null));
-        paths.put(ID_WICKET, cycle.urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null));
-
+        JavaScriptLibrarySettings javaScriptLibrarySettings = application.getJavaScriptLibrarySettings();
+        
+        String relativeRootPath = cycle.getUrlRenderer().renderRelativeUrl(Url.parse("/")).replaceAll("//", "/");
+        paths.put(ID_JQUERY, cycle.urlFor(javaScriptLibrarySettings.getJQueryReference(), null).toString().replace(relativeRootPath, "").replace(".js",""));
+        paths.put(ID_WICKET_EVENT, cycle.urlFor(javaScriptLibrarySettings.getWicketEventReference(), null).toString().replace(relativeRootPath, "").replace(".js",""));
+        paths.put(ID_WICKET, cycle.urlFor(javaScriptLibrarySettings.getWicketAjaxReference(), null).toString().replace(relativeRootPath, "").replace(".js",""));
+        
         requireJsConfig.put(KEY_PATHS, paths);
     }
 }
