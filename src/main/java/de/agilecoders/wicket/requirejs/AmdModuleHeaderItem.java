@@ -87,7 +87,8 @@ public class AmdModuleHeaderItem extends JavaScriptHeaderItem implements IRefere
     }
 
     @Override
-    public Iterable<? extends HeaderItem> getDependencies() {
+    public List<HeaderItem> getDependencies() {
+    	
         List<HeaderItem> dependencies = new ArrayList<>();
         dependencies.add(new RequireJsHeaderItem());
         return dependencies;

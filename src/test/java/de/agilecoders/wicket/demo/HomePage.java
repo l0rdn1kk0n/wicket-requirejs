@@ -41,7 +41,7 @@ public class HomePage extends WebPage
         }
 
         @Override
-        public Iterable<? extends HeaderItem> getDependencies() {
+        public List<HeaderItem> getDependencies() {
             List<HeaderItem> deps = new ArrayList<>();
             deps.add(AmdModuleHeaderItem.forReference(new JavaScriptResourceReference(PageB.class, "pageB.js"), "pageB"));
             return deps;

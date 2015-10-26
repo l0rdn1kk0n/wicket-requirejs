@@ -14,8 +14,8 @@ import org.apache.wicket.markup.head.NoHeaderItem;
  */
 public class RequireJsHeaderItem extends NoHeaderItem {
 
-    @Override
-    public Iterable<? extends HeaderItem> getDependencies() {
+    @Override   
+    public List<HeaderItem> getDependencies() {
         List<HeaderItem> dependencies = new ArrayList<>();
 
         dependencies.add(JavaScriptHeaderItem.forReference(new RequireJsResourceReference()));
